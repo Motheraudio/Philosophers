@@ -74,8 +74,8 @@ OBJECTS = ${SRCS:.c=.o}
 OBJDIR = obj
 OBJECTFILES = $(addprefix $(OBJDIR)/, $(OBJECTS))
 CC = cc
-CFLAGS = -Wall -Wextra -Werror
-$(OBJDIR)/%.o: %.c fdf.h
+CFLAGS = -pthread -Wall -Wextra -Werror
+$(OBJDIR)/%.o: %.c philo.h
 	@mkdir -p $(OBJDIR)
 	@$(CC) $(CFLAGS) -c $< -o $@
 

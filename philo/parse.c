@@ -56,9 +56,9 @@ int	parse_and_store(t_args *args, int argc, char **argv)
 	if (check_argv_for_ov_neg(argv) == -1)
 		return (write(2, "Negative or > INT_MAX not allowed", 33), -1);
 	args->philo_count = ft_atoi(argv[1]);
-	args->ttd = (atomic_size_t) ft_atoi(argv[2]);
-	args->tte = (atomic_size_t) ft_atoi(argv[3]);
-	args->tts = (atomic_size_t) ft_atoi(argv[4]);
+	atomic_init(&(args->ttd), ft_atoi(argv[2]));
+	atomic_init(&(args->tte), ft_atoi(argv[2]));
+	atomic_init(&(args->tts), ft_atoi(argv[2]));
 	if (argc == 6)
 		args->eat_count = ft_atoi(argv[5]);
 	if (argc == 5)
