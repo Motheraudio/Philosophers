@@ -46,22 +46,24 @@ int	check_argv_for_ov_neg(char **argv)
 	}
 	return (1);
 }
-int	parse_and_store(t_args *args, int argc, char **argv)
+int	parse_and_store(t_philo *sophers, int argc, char **argv)
 {
 
 	if (argc < 5 || argc > 6)
-		return(write(2, "Invalid args", 12), -1);
+		return(ft_putstr_fd("Invalid sophers", 2), -1);
 	if (contains_only_digits(argv) == -1)
-		return(write(2, "Only digits allowed", 19), -1);
+		return(ft_putstr_fd("Only digits allowed", 2), -1);
 	if (check_argv_for_ov_neg(argv) == -1)
-		return (write(2, "Negative or > INT_MAX not allowed", 33), -1);
-	args->philo_count = ft_atoi(argv[1]);
-	atomic_init(&(args->ttd), ft_atoi(argv[2]));
-	atomic_init(&(args->tte), ft_atoi(argv[2]));
-	atomic_init(&(args->tts), ft_atoi(argv[2]));
+		return(ft_putstr_fd("Negative or > INT_MAX not allowed", 2), -1);
+	sophers->philo_count = ft_atoi(argv[1]);
+	if (sophers->philo_count >= 1000)
+		return(ft_putstr_fd("Too much philosophers", 2), -1);
+	atomic_init(&(sophers->ttd), ft_atoi(argv[2]));
+	atomic_init(&(sophers->tte), ft_atoi(argv[2]));
+	atomic_init(&(sophers->tts), ft_atoi(argv[2]));
 	if (argc == 6)
-		args->eat_count = ft_atoi(argv[5]);
+		sophers->eat_count = ft_atoi(argv[5]);
 	if (argc == 5)
-		args->eat_count = NA;
+		sophers->eat_count = NA;
 	return (1);
 }
