@@ -1,59 +1,61 @@
-#include "philo.h"
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   philo.c                                            :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: alvcampo <alvcampo@student.42vienna.com>   +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/11/09 09:57:36 by alvcampo          #+#    #+#             */
+/*   Updated: 2025/11/09 18:24:13 by alvcampo         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
 
+#include "philo.h"
 // int	create_philos(t_philo *sophers)
 // {
 //
 // }
-
-void	destroy_prev_forks(pthread_mutex_t **forks, ssize_t i)
-{
-	while(--i != -1)
-		pthread_mutex_destroy(forks[i]);
-	free(*forks);
-	*forks = NULL;
-}
-int	create_forks(t_philo *sophers)
-{
-	ssize_t	i;
-
-	i = -1;
-	sophers->forks = malloc(sophers->philo_count + 1 * 
-						 sizeof(pthread_mutex_t));
-	if (sophers->forks == NULL)
-		return (ft_putstr_fd("forks alloc failed", 2), 0);
-	while(++i < sophers->philo_count)
-	{
-		if (pthread_mutex_init(&sophers->forks[i], NULL) == -1)
-			return (ft_putstr_fd("mutex creation fail", 2),
-				destroy_prev_forks(&sophers->forks, i), 0);
-	}
-	return (1);
-}
-
+#include <stdio.h>
 int	get_time_atomic(t_philo *sophers)
 {
 	struct timeval	start_time;
 
 	if (gettimeofday(&start_time, NULL) == -1)
-		return(ft_putstr_fd("how did u break gettimeofday", 2), 0);
-	atomic_init(&(sophers->atomic_mstime), start_time.tv_sec * 1000 + start_time.tv_usec / 1000);
+		return (ft_putstr_fd("how did u break gettimeofday", 2), 0);
+	atomic_init(&(sophers->atomic_ustime),
+		start_time.tv_sec * 1000000 + start_time.tv_usec); // this is in microseconds, for printing ineed miliseconds
 	return (1);
 }
-// int	join_philos (t_philo *sophers)
-// {
-//
-// }
-#include <stdio.h>
+
+int	create_states(t_philo *sophers)
+{
+	int	i;
+
+	i = -1;
+	sophers->states = malloc((sophers->philo_count + 1) * sizeof(atomic_int));
+	if (sophers->states == NULL)
+		return (ft_putstr_fd("State creation failed", 2), 0);
+	while (++i < sophers->philo_count + 1)
+		atomic_init(&sophers->states[i], 0);
+	atomic_init(&sophers->start, 0);
+	atomic_init(&sophers->death, 0);
+	return (1);
+}
+
 int	main(int argc, char **argv)
 {
 	t_philo	sophers;
 
+	memset(sophers.buffer, 0, 2000);
 	if (!get_time_atomic(&sophers))
 		return (1);
-	printf("%zu", sophers.atomic_mstime);
 	if (parse_and_store(&sophers, argc, argv) == -1)
 		return (1);
 	if (!create_forks(&sophers))
 		return (1);
-	
+	if (!create_states(&sophers))
+		return (destroy_prev_forks(&sophers, sophers.philo_count), 1);
+	if (!create_ids(&sophers))
+		return (destroy_prev_forks(&sophers, sophers.philo_count),
+			free(sophers.states), 1);
 }

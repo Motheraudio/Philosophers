@@ -1,4 +1,17 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   ft.c                                               :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: alvcampo <alvcampo@student.42vienna.com>   +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/11/09 09:56:17 by alvcampo          #+#    #+#             */
+/*   Updated: 2025/11/09 18:32:26 by alvcampo         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "philo.h"
+
 size_t	ft_strlen(const char *s)
 {
 	size_t	i;
@@ -8,7 +21,6 @@ size_t	ft_strlen(const char *s)
 		i++;
 	return (i);
 }
-
 
 void	ft_putstr_fd(char *s, int fd)
 {
@@ -27,8 +39,8 @@ void	ft_putstr_fd(char *s, int fd)
 int	ft_atoi(const char *str)
 {
 	size_t	i;
-	int	total;
-	int	sign;
+	int		total;
+	int		sign;
 
 	i = 0;
 	total = 0;
@@ -49,3 +61,21 @@ int	ft_atoi(const char *str)
 	return (total * sign);
 }
 
+size_t	ft_strlcpy(char *dst, const char *src, size_t size)
+{
+	size_t	srcsize;
+	size_t	i;
+
+	srcsize = ft_strlen(src);
+	i = 0;
+	if (size > 0)
+	{
+		while (src[i] && i < size - 1)
+		{
+			dst[i] = src[i];
+			i++;
+		}
+		dst[i] = '\0';
+	}
+	return (srcsize);
+}

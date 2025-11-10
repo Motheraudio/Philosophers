@@ -69,12 +69,12 @@ byebye:(
 endef
 export RAT
 export GOODBYE
-SRCS = ft.c parse.c philo.c
+SRCS = ft.c parse.c philo.c create_forks.c create_ids.c
 OBJECTS = ${SRCS:.c=.o}
 OBJDIR = obj
 OBJECTFILES = $(addprefix $(OBJDIR)/, $(OBJECTS))
 CC = cc
-CFLAGS = -pthread -Wall -Wextra -Werror
+CFLAGS = -pthread -Wall -Wextra -Werror -g
 $(OBJDIR)/%.o: %.c philo.h
 	@mkdir -p $(OBJDIR)
 	@$(CC) $(CFLAGS) -c $< -o $@
