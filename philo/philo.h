@@ -27,7 +27,11 @@ typedef struct s_id
 	atomic_int		number;
 	char			name[4];
 	atomic_size_t	last_ate;
-	atomic_size_t	times_eaten;
+	atomic_int		times_eaten;
+	atomic_size_t	*tte;
+	atomic_size_t	*tts;
+	atomic_size_t	*ttd;
+	atomic_int		*eat_count;
 	pthread_mutex_t forks[2];
 	char			*buffer;
 	atomic_int		*state;

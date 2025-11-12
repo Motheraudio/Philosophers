@@ -66,6 +66,10 @@ int	create_ids(t_philo *sophers)
 		sophers->ids[i].start = &sophers->start;
 		sophers->ids[i].death = &sophers->death;
 		sophers->ids[i].state = &sophers->states[i];
+		sophers->ids[i].tte = &sophers->tte;
+		sophers->ids[i].tts = &sophers->tts;
+		sophers->ids[i].ttd = &sophers->ttd;
+		sophers->ids[i].eat_count = &sophers->eat_count;
 	}
 	return (1);
 }
