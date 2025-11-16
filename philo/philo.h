@@ -12,7 +12,7 @@
 
 #ifndef PHILO_H
 # define PHILO_H
-# define NA 1
+# define NA -1
 # define ZZ 2
 # define RIP 3
 # include <stdlib.h>
@@ -28,15 +28,20 @@ typedef struct s_id
 	char			name[4];
 	atomic_size_t	last_ate;
 	atomic_int		times_eaten;
+	atomic_size_t	*start_time;
 	atomic_size_t	*tte;
 	atomic_size_t	*tts;
 	atomic_size_t	*ttd;
+	atomic_size_t	*ttt;
 	atomic_int		*eat_count;
 	pthread_mutex_t forks[2];
 	char			*buffer;
 	atomic_int		*state;
 	atomic_int		*start;
 	atomic_int		*death;
+	void			*(*start_routine)(void *t_id);
+	atomic_size_t	local_time;
+
 }				t_id;
 
 typedef struct s_philo
@@ -45,6 +50,7 @@ typedef struct s_philo
 	atomic_size_t	ttd;
 	atomic_size_t	tte;
 	atomic_size_t	tts;
+	atomic_size_t	ttt;
 	atomic_int		eat_count;
 	pthread_mutex_t	*forks;
 	pthread_t		*philosophers;
@@ -71,4 +77,6 @@ int		create_forks(t_philo *sophers);
 					/* ID creation */
 int		create_ids(t_philo *sophers);
 
+					/* Routines */
+void	*test_routine(void* ids);
 #endif

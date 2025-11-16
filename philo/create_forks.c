@@ -18,8 +18,8 @@ void	destroy_prev_forks(t_philo *sophers, ssize_t i)
 	ssize_t	j;
 	
 	j = -1;
-	while (++j <= i)
-		pthread_mutex_destroy(&sophers->forks[i]);
+	while (++j < i)
+		pthread_mutex_destroy(&sophers->forks[j]);
 	free(sophers->forks);
 	sophers->forks = NULL;
 }

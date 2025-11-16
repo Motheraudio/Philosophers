@@ -16,13 +16,31 @@
 //
 // }
 #include <stdio.h>
-int	get_time_atomic(t_philo *sophers)
+
+void	*ft_memcpy(void *dst, const void *src, size_t n)
+{
+	unsigned char	*tmp_dst;
+	unsigned char	*tmp_src;
+
+	tmp_dst = (unsigned char *)dst;
+	tmp_src = (unsigned char *)src;
+	while (n > 0)
+	{
+		*tmp_dst = *tmp_src;
+		tmp_dst++;
+		tmp_src++;
+		n--;
+	}
+	return (dst);
+}
+
+int	get_time_atomic(atomic_size_t *ustime)
 {
 	struct timeval	start_time;
 
 	if (gettimeofday(&start_time, NULL) == -1)
 		return (ft_putstr_fd("how did u break gettimeofday", 2), 0);
-	atomic_init(&(sophers->atomic_ustime),
+	atomic_init(ustime,
 		start_time.tv_sec * 1000000 + start_time.tv_usec); // this is in microseconds, for printing ineed miliseconds
 	return (1);
 }
@@ -42,20 +60,88 @@ int	create_states(t_philo *sophers)
 	return (1);
 }
 
+void join_prev_threads(t_philo *sophers, ssize_t i)
+{
+	ssize_t	j;
+	
+	j = -1;
+	while (++j < i)
+		pthread_join(sophers->philosophers[j], NULL);
+	free(sophers->philosophers);
+	sophers->philosophers = NULL;
+}
+
+void	*start_routine(void *ids)
+{
+	t_id	stack_ids;
+
+	ft_memcpy((void *)&stack_ids, ids, sizeof(t_id));
+	get_time_atomic(&stack_ids.local_time);
+	atomic_store(&stack_ids.local_time, atomic_load(&stack_ids.local_time) - atomic_load(stack_ids.start_time));
+	return (stack_ids.start_routine((void *)&stack_ids));
+}
+int	init_threads(t_philo *sophers)
+{
+	ssize_t	i;
+
+	i = -1;
+	while(++i <= sophers->philo_count)
+	{
+		if (pthread_create(&sophers->philosophers[i], NULL, &start_routine, 
+					 (void *)&sophers->ids[i]) != 0)
+			return(join_prev_threads(sophers, i), 0);
+	}
+	return (1);
+}
+int	loop_infinite(t_philo *sophers)
+{
+	if (!get_time_atomic(&sophers->atomic_ustime))
+		return (0);
+	if (!init_threads(sophers))
+		return (0);
+	while (sophers->start != sophers->philo_count + 1)
+		usleep(10);
+	usleep(0);
+	while (1)
+	{
+		if (sophers->death != 0)
+		{
+			printf("rip");
+			break ;
+		}
+	}
+	return (1);
+}
+
+int	create_philos(t_philo *sophers)
+{
+
+	sophers->philosophers = malloc((sophers->philo_count + 1) * sizeof(pthread_t));
+	if (!sophers->philosophers)
+		return (0);
+	return (1);
+}
 int	main(int argc, char **argv)
 {
 	t_philo	sophers;
 
 	memset(sophers.buffer, 0, 2000);
-	if (!get_time_atomic(&sophers))
-		return (1);
 	if (parse_and_store(&sophers, argc, argv) == -1)
 		return (1);
 	if (!create_forks(&sophers))
 		return (1);
 	if (!create_states(&sophers))
 		return (destroy_prev_forks(&sophers, sophers.philo_count), 1);
+	if (!create_philos(&sophers))
+		return(destroy_prev_forks(&sophers, sophers.philo_count),  free(sophers.states), 1);
 	if (!create_ids(&sophers))
 		return (destroy_prev_forks(&sophers, sophers.philo_count),
 			free(sophers.states), 1);
+	if (sophers.eat_count == NA)
+		loop_infinite(&sophers);
+	free(sophers.ids);
+	free(sophers.states);
+	join_prev_threads(&sophers, sophers.philo_count + 1);
+	destroy_prev_forks(&sophers, sophers.philo_count + 1);
+	
 }

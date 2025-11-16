@@ -47,6 +47,16 @@ void	give_forks(t_philo *sophers, int i)
 		sophers->ids[i].forks[1] = sophers->forks[i + 1];
 
 }
+
+void	*test_routine(void* ids)
+{
+	t_id *cast_id;
+
+	cast_id = (t_id *) ids;
+	*cast_id->start += 1;
+	*cast_id->death += 1;
+	return (NULL);
+}
 int	create_ids(t_philo *sophers)
 {
 	int	i;
@@ -69,7 +79,11 @@ int	create_ids(t_philo *sophers)
 		sophers->ids[i].tte = &sophers->tte;
 		sophers->ids[i].tts = &sophers->tts;
 		sophers->ids[i].ttd = &sophers->ttd;
+		sophers->ids[i].ttt = &sophers->ttt;
+		sophers->ids[i].start_time = &sophers->atomic_ustime;
 		sophers->ids[i].eat_count = &sophers->eat_count;
+		sophers->ids[i].start_routine = test_routine;
+		// call func that adds starting routine
 	}
 	return (1);
 }

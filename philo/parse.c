@@ -71,11 +71,12 @@ int	parse_and_store(t_philo *sophers, int argc, char **argv)
 	sophers->philo_count = ft_atoi(argv[1]);
 	if (sophers->philo_count >= 1000)
 		return (ft_putstr_fd("Too much philosophers", 2), -1);
-	atomic_init(&(sophers->ttd), ft_atoi(argv[2]));
-	atomic_init(&(sophers->tte), ft_atoi(argv[3]));
-	atomic_init(&(sophers->tts), ft_atoi(argv[4]));
+	atomic_init(&(sophers->ttd), ft_atoi(argv[2]) * 1000);
+	atomic_init(&(sophers->tte), ft_atoi(argv[3]) * 1000);
+	atomic_init(&(sophers->tts), ft_atoi(argv[4]) * 1000);
+	atomic_init(&(sophers->ttt), (sophers->ttd - sophers->tts) * 1000);
 	if (argc == 6)
-		atomic_init(&(sophers->eat_count), ft_atoi(argv[5]));
+		atomic_init(&(sophers->eat_count), ft_atoi(argv[5]) * 1000);
 	if (argc == 5)
 		sophers->eat_count = NA;
 	return (1);
