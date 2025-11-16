@@ -15,6 +15,11 @@
 # define NA -1
 # define ZZ 2
 # define RIP 3
+# define FORK 1
+# define EAT 2
+# define SLEEP 3
+# define THINK 4
+# define DIE 5
 # include <stdlib.h>
 # include <pthread.h>
 # include <stdatomic.h>
@@ -39,8 +44,9 @@ typedef struct s_id
 	atomic_int		*state;
 	atomic_int		*start;
 	atomic_int		*death;
+	pthread_mutex_t	*print_mutex;
 	void			*(*start_routine)(void *t_id);
-	atomic_size_t	local_time;
+	atomic_int		atomic_p_count;
 
 }				t_id;
 
@@ -79,4 +85,7 @@ int		create_ids(t_philo *sophers);
 
 					/* Routines */
 void	*test_routine(void* ids);
+
+					/* Time */
+int		get_time_atomic(atomic_size_t *ustime);
 #endif

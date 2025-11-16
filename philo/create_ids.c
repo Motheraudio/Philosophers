@@ -53,8 +53,47 @@ void	*test_routine(void* ids)
 	t_id *cast_id;
 
 	cast_id = (t_id *) ids;
-	*cast_id->start += 1;
-	*cast_id->death += 1;
+	return (NULL);
+}
+
+void	*print_routine(void* ids)
+{
+	t_id *cast_id;
+	cast_id = (t_id *) ids;
+	return (NULL);
+}
+
+void	*eat_routine(void *ids)
+{
+	t_id *cast_id;
+	atomic_size_t	time;
+
+	cast_id = (t_id *) ids;
+	if (*cast_id->death > 0 || *cast_id->ttd >= cast_id->last_ate)
+	{
+		*cast_id->death += 1;
+		// pass to print mutex, kill sim
+	}
+	get_time_atomic(&time);
+	atomic_store(&cast_id->last_ate, time - atomic_load(cast_id->start_time));
+	usleep(*cast_id->tte);
+	return (NULL);
+}
+
+void	*print_mutex(t_id *ids, int message)
+{
+	pthread_mutex_lock(
+}
+void	*sleep_routine(void* ids)
+{
+	t_id *cast_id;
+	cast_id = (t_id *) ids;
+	return (NULL);
+}
+void	*god_routine(void* ids)
+{
+	t_id *cast_id;
+	cast_id = (t_id *) ids;
 	return (NULL);
 }
 int	create_ids(t_philo *sophers)
@@ -67,10 +106,11 @@ int	create_ids(t_philo *sophers)
 		return (ft_putstr_fd("ID allocation failed", 2), 0);
 	while (++i < sophers->philo_count + 1)
 	{
-		atomic_init(&sophers->ids[i].number, sophers->philo_count);
+		atomic_init(&sophers->ids[i].number, i);
 		itoa_4(sophers->ids[i].name, i);
 		atomic_init(&sophers->ids[i].last_ate, 0);
 		atomic_init(&sophers->ids[i].times_eaten, 0);
+		atomic_init(&sophers->ids[i].atomic_p_count, sophers->philo_count);
 		give_forks(sophers, i);
 		sophers->ids[i].buffer = sophers->buffer;
 		sophers->ids[i].start = &sophers->start;
@@ -82,7 +122,8 @@ int	create_ids(t_philo *sophers)
 		sophers->ids[i].ttt = &sophers->ttt;
 		sophers->ids[i].start_time = &sophers->atomic_ustime;
 		sophers->ids[i].eat_count = &sophers->eat_count;
-		sophers->ids[i].start_routine = test_routine;
+		if(i % 2 == 0)
+			sophers->ids[i].start_routine = test_routine;
 		// call func that adds starting routine
 	}
 	return (1);

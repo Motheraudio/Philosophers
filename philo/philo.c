@@ -76,8 +76,9 @@ void	*start_routine(void *ids)
 	t_id	stack_ids;
 
 	ft_memcpy((void *)&stack_ids, ids, sizeof(t_id));
-	get_time_atomic(&stack_ids.local_time);
-	atomic_store(&stack_ids.local_time, atomic_load(&stack_ids.local_time) - atomic_load(stack_ids.start_time));
+	*stack_ids.start += 1;
+	while(*stack_ids.start != stack_ids.atomic_p_count + 1)
+		usleep(1);
 	return (stack_ids.start_routine((void *)&stack_ids));
 }
 int	init_threads(t_philo *sophers)
@@ -100,7 +101,7 @@ int	loop_infinite(t_philo *sophers)
 	if (!init_threads(sophers))
 		return (0);
 	while (sophers->start != sophers->philo_count + 1)
-		usleep(10);
+		usleep(1);
 	usleep(0);
 	while (1)
 	{
@@ -131,11 +132,11 @@ int	main(int argc, char **argv)
 	if (!create_forks(&sophers))
 		return (1);
 	if (!create_states(&sophers))
-		return (destroy_prev_forks(&sophers, sophers.philo_count), 1);
+		return (destroy_prev_forks(&sophers, sophers.philo_count + 1), 1);
 	if (!create_philos(&sophers))
-		return(destroy_prev_forks(&sophers, sophers.philo_count),  free(sophers.states), 1);
+		return(destroy_prev_forks(&sophers, sophers.philo_count + 1),  free(sophers.states), 1);
 	if (!create_ids(&sophers))
-		return (destroy_prev_forks(&sophers, sophers.philo_count),
+		return (destroy_prev_forks(&sophers, sophers.philo_count + 1),
 			free(sophers.states), 1);
 	if (sophers.eat_count == NA)
 		loop_infinite(&sophers);

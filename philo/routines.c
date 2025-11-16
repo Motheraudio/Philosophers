@@ -31,6 +31,7 @@ void *print_routine(t_id *id)
 	t_id stack_id;
 	ssize_t	i;
 
+	i = -1;
 	if (!get_time_start(id))
 		return (*id->state = -1, NULL);
 	ft_memcpy(&stack_id, id, sizeof(t_id)); // free the ids once everyone is ready in the main;
