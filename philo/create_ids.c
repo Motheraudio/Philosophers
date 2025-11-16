@@ -69,13 +69,15 @@ void	*eat_routine(void *ids)
 	atomic_size_t	time;
 
 	cast_id = (t_id *) ids;
-	if (*cast_id->death > 0 || *cast_id->ttd >= cast_id->last_ate)
+	get_time_atomic(&time);
+	if (*cast_id->death > 0 || *cast_id->ttd >= time - cast_id->last_ate)
 	{
 		*cast_id->death += 1;
 		// pass to print mutex, kill sim
 	}
-	get_time_atomic(&time);
-	atomic_store(&cast_id->last_ate, time - atomic_load(cast_id->start_time));
+	atomic_store(&cast_id->last_ate, time);
+	//pick forks, print
+	// print eat, sleep
 	usleep(*cast_id->tte);
 	return (NULL);
 }
