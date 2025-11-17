@@ -36,15 +36,16 @@ void itoa_4(char dst[4], int src)
 
 void	give_forks(t_philo *sophers, int i)
 {
+	sophers->ids[i].print_mutex = &sophers->forks[0];
 	if (i == 0)
 		return ;
-	sophers->ids[i].forks[0] = sophers->forks[i];
+	sophers->ids[i].forks[0] = &sophers->forks[i];
 	if (i == 1)
-		sophers->ids[i].forks[1] = sophers->forks[sophers->philo_count];
+		sophers->ids[i].forks[1] = &sophers->forks[sophers->philo_count];
 	else if (i == sophers->philo_count)
-		sophers->ids[i].forks[1] = sophers->forks[1];
+		sophers->ids[i].forks[1] = &sophers->forks[1];
 	else
-		sophers->ids[i].forks[1] = sophers->forks[i + 1];
+		sophers->ids[i].forks[1] = &sophers->forks[i + 1];
 
 }
 
@@ -63,35 +64,75 @@ void	*print_routine(void* ids)
 	return (NULL);
 }
 
-void	*eat_routine(void *ids)
+
+void	print_mutex(t_id *ids, int message)
 {
-	t_id *cast_id;
+	if (pthread_mutex_lock(ids->print_mutex) != 0)
+		return((void)ft_putstr_fd("print mutex couldn't be locked", 2));
+	if (message == FORK)
+		printf("%s has taken a fork", ids->name); // add time later
+	else if (message == EAT)
+		printf("%s is eating", ids->name);
+	else if (message == SLEEP)
+		printf("%s is sleeping", ids->name);
+	else if (message == THINK)
+		printf("%s is thinking", ids->name);
+	else if (message == DIE)
+	{
+		printf("%s died", ids->name);
+		pthread_mutex_unlock(ids->print_mutex);
+		*ids->death += 1;
+		return ;
+	}
+	pthread_mutex_unlock(ids->print_mutex);
+}
+
+void	*think_routine(void* ids)
+{
+	t_id			*cast_id;
 	atomic_size_t	time;
 
 	cast_id = (t_id *) ids;
 	get_time_atomic(&time);
 	if (*cast_id->death > 0 || *cast_id->ttd >= time - cast_id->last_ate)
-	{
-		*cast_id->death += 1;
-		// pass to print mutex, kill sim
-	}
-	atomic_store(&cast_id->last_ate, time);
-	//pick forks, print
-	// print eat, sleep
-	usleep(*cast_id->tte);
-	return (NULL);
-}
+		return (print_mutex(cast_id, DIE), NULL);
+	usleep(*cast_id->ttt);
+	print_mutex(cast_id, THINK);
+	return(eat_routine(ids));
 
-void	*print_mutex(t_id *ids, int message)
-{
-	pthread_mutex_lock(
 }
 void	*sleep_routine(void* ids)
 {
-	t_id *cast_id;
+	t_id			*cast_id;
+	atomic_size_t	time;
+
 	cast_id = (t_id *) ids;
-	return (NULL);
+	get_time_atomic(&time);
+	if (*cast_id->death > 0 || *cast_id->ttd >= time - cast_id->last_ate)
+		return (print_mutex(cast_id, DIE), NULL);
+	usleep(*cast_id->tts);
+	print_mutex(cast_id, SLEEP);
+	return(think_routine(ids));
 }
+void	*eat_routine(void *ids)
+{
+	t_id			*cast_id;
+	atomic_size_t	time;
+
+	cast_id = (t_id *) ids;
+	get_time_atomic(&time);
+	if (*cast_id->death > 0 || *cast_id->ttd >= time - cast_id->last_ate)
+		return (print_mutex(cast_id, DIE), NULL);
+	atomic_store(&cast_id->last_ate, time);
+	pthread_mutex_lock(cast_id->forks[0]);
+	print_mutex(cast_id, FORK);
+	pthread_mutex_lock(cast_id->forks[1]);
+	print_mutex(cast_id, FORK);
+	print_mutex(cast_id, EAT);
+	usleep(*cast_id->tte);
+	return(sleep_routine(ids));
+}
+
 void	*god_routine(void* ids)
 {
 	t_id *cast_id;
@@ -124,8 +165,13 @@ int	create_ids(t_philo *sophers)
 		sophers->ids[i].ttt = &sophers->ttt;
 		sophers->ids[i].start_time = &sophers->atomic_ustime;
 		sophers->ids[i].eat_count = &sophers->eat_count;
+		if (i == 0)
+			sophers->ids[i].start_routine = NULL;
 		if(i % 2 == 0)
-			sophers->ids[i].start_routine = test_routine;
+			sophers->ids[i].start_routine = eat_routine;
+		else
+			sophers->ids[i].start_routine = think_routine;
+
 		// call func that adds starting routine
 	}
 	return (1);

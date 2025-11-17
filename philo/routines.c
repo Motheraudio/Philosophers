@@ -26,28 +26,4 @@ int	get_time_start(t_id *id)
 	return (1);
 }
 
-void *print_routine(t_id *id)
-{
-	t_id stack_id;
-	ssize_t	i;
 
-	i = -1;
-	if (!get_time_start(id))
-		return (*id->state = -1, NULL);
-	ft_memcpy(&stack_id, id, sizeof(t_id)); // free the ids once everyone is ready in the main;
-	while (*stack_id.eat_count == NA)
-	{
-		
-	}
-
-}
-
-void	*start_eat(t_id *id)
-{
-	t_id	stack_id;
-	struct	timeval	time;
-
-	ft_memcpy(&stack_id, id, sizeof(t_id));
-	gettimeofday(&time, NULL);
-
-}

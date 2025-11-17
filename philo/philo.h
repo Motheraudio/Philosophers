@@ -20,13 +20,15 @@
 # define SLEEP 3
 # define THINK 4
 # define DIE 5
+# define LEFT 0
+# define RIGHT 1
 # include <stdlib.h>
 # include <pthread.h>
 # include <stdatomic.h>
 # include <unistd.h>
 # include <sys/time.h>
 # include <string.h>
-
+#include <stdio.h>
 typedef struct s_id
 {
 	atomic_int		number;
@@ -39,7 +41,7 @@ typedef struct s_id
 	atomic_size_t	*ttd;
 	atomic_size_t	*ttt;
 	atomic_int		*eat_count;
-	pthread_mutex_t forks[2];
+	pthread_mutex_t *forks[2];
 	char			*buffer;
 	atomic_int		*state;
 	atomic_int		*start;
@@ -85,6 +87,9 @@ int		create_ids(t_philo *sophers);
 
 					/* Routines */
 void	*test_routine(void* ids);
+void	*think_routine(void* ids);
+void	*sleep_routine(void* ids);
+void	*eat_routine(void *ids);
 
 					/* Time */
 int		get_time_atomic(atomic_size_t *ustime);

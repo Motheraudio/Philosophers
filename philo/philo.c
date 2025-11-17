@@ -106,10 +106,7 @@ int	loop_infinite(t_philo *sophers)
 	while (1)
 	{
 		if (sophers->death != 0)
-		{
-			printf("rip");
 			break ;
-		}
 	}
 	return (1);
 }
