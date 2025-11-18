@@ -52,7 +52,7 @@ int	create_states(t_philo *sophers)
 	i = -1;
 	sophers->states = malloc((sophers->philo_count + 1) * sizeof(atomic_int));
 	if (sophers->states == NULL)
-		return (ft_putstr_fd("State creation failed", 2), 0);
+		return (ft_putstr_fd("State creation failed\n", 2), 0);
 	while (++i < sophers->philo_count + 1)
 		atomic_init(&sophers->states[i], 0);
 	atomic_init(&sophers->start, 0);
