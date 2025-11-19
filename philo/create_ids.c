@@ -65,7 +65,7 @@ void	*print_routine(void* ids)
 }
 
 
-void	print_mutex(t_id *ids, int message)
+void	print_mutex(t_id *ids, int message,atomic_size_t time)
 {
 	static atomic_int printdeath = 0;
 
@@ -74,17 +74,17 @@ void	print_mutex(t_id *ids, int message)
 	if (pthread_mutex_lock(ids->print_mutex) != 0)
 		return((void)ft_putstr_fd("print mutex couldn't be locked\n", 2));
 	if (message == FORK)
-		printf("%s has taken a fork\n", ids->name); // add time later
+		printf("%zu %s has taken a fork\n", time, ids->name); // add time later
 	else if (message == EAT)
-		printf("%s is eating\n", ids->name);
+		printf("%zu %s is eating\n", time, ids->name);
 	else if (message == SLEEP)
-		printf("%s is sleeping\n", ids->name);
+		printf("%zu %s is sleeping\n", time, ids->name);
 	else if (message == THINK)
-		printf("%s is thinking\n", ids->name);
+		printf("%zu %s is thinking\n", time, ids->name);
 	else if (message == DIE)
 	{
 		printdeath++;
-		printf("%s died\n", ids->name);
+		printf("%zu %s died\n", time, ids->name);
 	}
 	pthread_mutex_unlock(ids->print_mutex);
 }
@@ -96,12 +96,13 @@ void	*think_routine(void* ids)
 
 	cast_id = (t_id *) ids;
 	get_time_atomic(&time);
-	if (*cast_id->death > 0 || *cast_id->ttd >= time - cast_id->last_ate)
-		return (*cast_id->death += 1, print_mutex(cast_id, DIE), NULL);
+	if (*cast_id->ttd >= time - cast_id->last_ate)
+		return (*cast_id->death += 1, print_mutex(cast_id, DIE, time), NULL);
 	usleep(*cast_id->ttt);
-	print_mutex(cast_id, THINK);
-	if (*cast_id->death > 0 || *cast_id->ttd >= time - cast_id->last_ate)
-		return (*cast_id->death += 1, print_mutex(cast_id, DIE), NULL);
+	print_mutex(cast_id, THINK, time);
+	get_time_atomic(&time);
+	if (*cast_id->ttd >= time - cast_id->last_ate)
+		return (*cast_id->death += 1, print_mutex(cast_id, DIE, time), NULL);
 	return(eat_routine(cast_id));
 
 }
@@ -109,15 +110,15 @@ void	*sleep_routine(void* ids)
 {
 	t_id			*cast_id;
 	atomic_size_t	time;
-
 	cast_id = (t_id *) ids;
 	get_time_atomic(&time);
-	if (*cast_id->death > 0 || *cast_id->ttd >= time - cast_id->last_ate)
-		return (*cast_id->death += 1, print_mutex(cast_id, DIE), NULL);
+	if (*cast_id->ttd >= time - cast_id->last_ate)
+		return (*cast_id->death += 1, print_mutex(cast_id, DIE, time), NULL);
 	usleep(*cast_id->tts);
-	if (*cast_id->death > 0 || *cast_id->ttd >= time - cast_id->last_ate)
-		return (*cast_id->death += 1, print_mutex(cast_id, DIE), NULL);
-	print_mutex(cast_id, SLEEP);
+	get_time_atomic(&time);
+	if (*cast_id->ttd >= time - cast_id->last_ate)
+		return (*cast_id->death += 1, print_mutex(cast_id, DIE, time), NULL);
+	print_mutex(cast_id, SLEEP, time);
 	return(think_routine(cast_id));
 }
 void	*eat_routine(void *ids)
@@ -127,19 +128,20 @@ void	*eat_routine(void *ids)
 
 	cast_id = (t_id *) ids;
 	get_time_atomic(&time);
-	if (*cast_id->death > 0 || *cast_id->ttd >= time - cast_id->last_ate)
-		return (*cast_id->death += 1, print_mutex(cast_id, DIE), NULL);
+	if (*cast_id->ttd >= time - cast_id->last_ate)
+		return (*cast_id->death += 1, print_mutex(cast_id, DIE, time), NULL);
 	atomic_store(&cast_id->last_ate, time);
 	pthread_mutex_lock(cast_id->forks[0]);
-	print_mutex(cast_id, FORK);
+	print_mutex(cast_id, FORK, time);
 	pthread_mutex_lock(cast_id->forks[1]);
-	print_mutex(cast_id, FORK);
-	print_mutex(cast_id, EAT);
+	print_mutex(cast_id, FORK, time);
+	print_mutex(cast_id, EAT, time);
 	usleep(*cast_id->tte);
-	if (*cast_id->death > 0 || *cast_id->ttd >= time - cast_id->last_ate)
-		return (*cast_id->death += 1, print_mutex(cast_id, DIE), NULL);
 	pthread_mutex_unlock(cast_id->forks[0]);
 	pthread_mutex_unlock(cast_id->forks[1]);
+	get_time_atomic(&time);
+	if (*cast_id->ttd >= time - cast_id->last_ate)
+		return (*cast_id->death += 1, print_mutex(cast_id, DIE, time), NULL);
 	return(sleep_routine(cast_id));
 }
 
