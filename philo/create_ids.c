@@ -96,12 +96,12 @@ void	*think_routine(void* ids)
 
 	cast_id = (t_id *) ids;
 	get_time_atomic(&time);
-	if (*cast_id->ttd >= time - cast_id->last_ate)
+	if (*cast_id->ttd <= time - cast_id->last_ate)
 		return (*cast_id->death += 1, print_mutex(cast_id, DIE, time), NULL);
 	usleep(*cast_id->ttt);
 	print_mutex(cast_id, THINK, time);
 	get_time_atomic(&time);
-	if (*cast_id->ttd >= time - cast_id->last_ate)
+	if (*cast_id->ttd <= time - cast_id->last_ate)
 		return (*cast_id->death += 1, print_mutex(cast_id, DIE, time), NULL);
 	return(eat_routine(cast_id));
 
@@ -112,11 +112,11 @@ void	*sleep_routine(void* ids)
 	atomic_size_t	time;
 	cast_id = (t_id *) ids;
 	get_time_atomic(&time);
-	if (*cast_id->ttd >= time - cast_id->last_ate)
+	if (*cast_id->ttd <= time - cast_id->last_ate)
 		return (*cast_id->death += 1, print_mutex(cast_id, DIE, time), NULL);
 	usleep(*cast_id->tts);
 	get_time_atomic(&time);
-	if (*cast_id->ttd >= time - cast_id->last_ate)
+	if (*cast_id->ttd <= time - cast_id->last_ate)
 		return (*cast_id->death += 1, print_mutex(cast_id, DIE, time), NULL);
 	print_mutex(cast_id, SLEEP, time);
 	return(think_routine(cast_id));
@@ -128,8 +128,8 @@ void	*eat_routine(void *ids)
 
 	cast_id = (t_id *) ids;
 	get_time_atomic(&time);
-	if (*cast_id->ttd >= time - cast_id->last_ate)
-		return (*cast_id->death += 1, print_mutex(cast_id, DIE, time), NULL);
+	if (*cast_id->ttd <= time - cast_id->last_ate)
+		return (printf("ttd: %zu, time: %zu, last ate: %zu\n", *cast_id->ttd, time, time - cast_id->last_ate), *cast_id->death += 1, print_mutex(cast_id, DIE, time), NULL);
 	atomic_store(&cast_id->last_ate, time);
 	pthread_mutex_lock(cast_id->forks[0]);
 	print_mutex(cast_id, FORK, time);
@@ -140,7 +140,7 @@ void	*eat_routine(void *ids)
 	pthread_mutex_unlock(cast_id->forks[0]);
 	pthread_mutex_unlock(cast_id->forks[1]);
 	get_time_atomic(&time);
-	if (*cast_id->ttd >= time - cast_id->last_ate)
+	if (*cast_id->ttd <= time - cast_id->last_ate)
 		return (*cast_id->death += 1, print_mutex(cast_id, DIE, time), NULL);
 	return(sleep_routine(cast_id));
 }

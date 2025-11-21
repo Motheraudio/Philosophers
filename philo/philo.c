@@ -74,8 +74,10 @@ void join_prev_threads(t_philo *sophers, ssize_t i)
 void	*start_routine(void *ids)
 {
 	t_id	stack_ids;
-
+	atomic_size_t	time;
 	ft_memcpy((void *)&stack_ids, ids, sizeof(t_id));
+	get_time_atomic(&time);
+	stack_ids.last_ate = time;
 	*stack_ids.start += 1;
 	while(*stack_ids.start != stack_ids.atomic_p_count + 1)
 		usleep(1);
