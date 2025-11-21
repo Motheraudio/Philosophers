@@ -107,8 +107,8 @@ int	loop_infinite(t_philo *sophers)
 	usleep(0);
 	while (1)
 	{
-		if (sophers->death != 0)
-			break ;
+		if (sophers->death == sophers->philo_count + 1)
+			return(1) ;
 	}
 	return (1);
 }
