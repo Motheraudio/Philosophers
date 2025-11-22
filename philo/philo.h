@@ -46,6 +46,7 @@ typedef struct s_id
 	atomic_int		*state;
 	atomic_int		*start;
 	atomic_int		*death;
+	atomic_int		*end;
 	pthread_mutex_t	*print_mutex;
 	void			*(*start_routine)(void *t_id);
 	atomic_int		atomic_p_count;
@@ -68,6 +69,7 @@ typedef struct s_philo
 	atomic_int		*states;
 	atomic_int		start;
 	atomic_int		death;
+	atomic_int		end;
 }				t_philo;
 
 					/* Parse */
