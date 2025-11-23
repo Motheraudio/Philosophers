@@ -65,9 +65,13 @@ void join_prev_threads(t_philo *sophers, ssize_t i)
 {
 	ssize_t	j;
 	
-	j = -1;
-	while (++j < i)
+	j = 0;
+	while (j < i)
+	{
+		printf("joining %zu\n", j);
 		pthread_join(sophers->philosophers[j], NULL);
+		j++;
+	}
 	free(sophers->philosophers);
 	sophers->philosophers = NULL;
 }
@@ -80,8 +84,8 @@ void	*start_routine(void *ids)
 	atomic_fetch_add(stack_ids.start, 1);
 	while(atomic_load(stack_ids.start) != stack_ids.atomic_p_count + 1)
 		usleep(1);
-	if (stack_ids.number % 2 != 0)
-		usleep(200);
+	// if (stack_ids.number % 2 != 0)
+	// 	usleep(200);
 	get_time_atomic(&time);
 	stack_ids.last_ate = time;
 	return (stack_ids.start_routine((void *)&stack_ids));
@@ -108,14 +112,14 @@ int	loop_infinite(t_philo *sophers)
 	while (atomic_load(&sophers->start) != sophers->philo_count + 1)
 		usleep(1);
 	usleep(0);
-	while (1)
-	{
-		if (atomic_load(&sophers->death) >= sophers->philo_count)
-			break ;
-		// if(sophers->eat_count != NA)
-		// 	if (sophers->end >= sophers->philo_count + 1)
-		// 		return (1);
-	}
+	// while (1)
+	// {
+	// 	if (atomic_load(&sophers->death) >= sophers->philo_count)
+	// 		break ;
+	// 	// if(sophers->eat_count != NA)
+	// 	// 	if (sophers->end >= sophers->philo_count + 1)
+	// 	// 		return (1);
+	// }
 	return (1);
 }
 
@@ -144,9 +148,9 @@ int	main(int argc, char **argv)
 		return (destroy_prev_forks(&sophers, sophers.philo_count + 1),
 			free(sophers.states), 1);
 	loop_infinite(&sophers);
+	join_prev_threads(&sophers, sophers.philo_count + 1);
 	free(sophers.ids);
 	free(sophers.states);
-	join_prev_threads(&sophers, sophers.philo_count + 1);
 	destroy_prev_forks(&sophers, sophers.philo_count + 1);
 	
 }
