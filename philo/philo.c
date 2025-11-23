@@ -45,20 +45,11 @@ int	get_time_atomic(atomic_size_t *ustime)
 	return (1);
 }
 
-int	create_states(t_philo *sophers)
+void	create_states(t_philo *sophers)
 {
-	int	i;
-
-	i = -1;
-	sophers->states = malloc((sophers->philo_count + 1) * sizeof(atomic_int));
-	if (sophers->states == NULL)
-		return (ft_putstr_fd("State creation failed\n", 2), 0);
-	while (++i < sophers->philo_count + 1)
-		atomic_init(&sophers->states[i], 0);
 	atomic_init(&sophers->start, 0);
 	atomic_init(&sophers->death, 0);
 	atomic_init(&sophers->end, 0);
-	return (1);
 }
 
 void join_prev_threads(t_philo *sophers, ssize_t i)
@@ -69,7 +60,6 @@ void join_prev_threads(t_philo *sophers, ssize_t i)
 	while (j < i)
 	{
 		pthread_join(sophers->philosophers[j], NULL);
-		printf("joining %zu\n", j);
 		j++;
 	}
 	free(sophers->philosophers);
@@ -85,7 +75,7 @@ void	*start_routine(void *ids)
 	while(atomic_load(stack_ids.start) != stack_ids.atomic_p_count + 1)
 		usleep(1);
 	// if (stack_ids.number % 2 != 0)
-	// 	usleep(200);
+		// usleep(200);
 	get_time_atomic(&time);
 	stack_ids.last_ate = time;
 	return (stack_ids.start_routine((void *)&stack_ids));
@@ -135,22 +125,18 @@ int	main(int argc, char **argv)
 {
 	t_philo	sophers;
 
-	memset(sophers.buffer, 0, 2000);
 	if (parse_and_store(&sophers, argc, argv) == -1)
 		return (1);
 	if (!create_forks(&sophers))
 		return (1);
-	if (!create_states(&sophers))
-		return (destroy_prev_forks(&sophers, sophers.philo_count + 1), 1);
+	create_states(&sophers);
 	if (!create_philos(&sophers))
-		return(destroy_prev_forks(&sophers, sophers.philo_count + 1),  free(sophers.states), 1);
+		return(destroy_prev_forks(&sophers, sophers.philo_count + 1), 1);
 	if (!create_ids(&sophers))
-		return (destroy_prev_forks(&sophers, sophers.philo_count + 1),
-			free(sophers.states), 1);
+		return (destroy_prev_forks(&sophers, sophers.philo_count + 1), 1);
 	loop_infinite(&sophers);
 	join_prev_threads(&sophers, sophers.philo_count + 1);
 	free(sophers.ids);
-	free(sophers.states);
 	destroy_prev_forks(&sophers, sophers.philo_count + 1);
 	
 }

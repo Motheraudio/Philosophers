@@ -32,7 +32,6 @@
 typedef struct s_id
 {
 	atomic_int		number;
-	char			name[4];
 	atomic_size_t	last_ate;
 	atomic_int		times_eaten;
 	atomic_size_t	*start_time;
@@ -42,8 +41,6 @@ typedef struct s_id
 	atomic_size_t	*ttt;
 	atomic_int		*eat_count;
 	pthread_mutex_t *forks[2];
-	char			*buffer;
-	atomic_int		*state;
 	atomic_int		*start;
 	atomic_int		*death;
 	atomic_int		*end;
@@ -65,8 +62,6 @@ typedef struct s_philo
 	pthread_t		*philosophers;
 	atomic_size_t	atomic_ustime;
 	t_id			*ids;
-	char			buffer[2000];
-	atomic_int		*states;
 	atomic_int		start;
 	atomic_int		death;
 	atomic_int		end;
