@@ -77,8 +77,8 @@ void	*start_routine(void *ids)
 	t_id	stack_ids;
 	atomic_size_t	time;
 	ft_memcpy((void *)&stack_ids, ids, sizeof(t_id));
-	*stack_ids.start += 1;
-	while(*stack_ids.start != stack_ids.atomic_p_count + 1)
+	atomic_fetch_add(stack_ids.start, 1);
+	while(atomic_load(stack_ids.start) != stack_ids.atomic_p_count + 1)
 		usleep(1);
 	if (stack_ids.number % 2 != 0)
 		usleep(200);
@@ -105,12 +105,12 @@ int	loop_infinite(t_philo *sophers)
 		return (0);
 	if (!get_time_atomic(&sophers->atomic_ustime))
 		return (0);
-	while (sophers->start != sophers->philo_count + 1)
+	while (atomic_load(&sophers->start) != sophers->philo_count + 1)
 		usleep(1);
 	usleep(0);
 	while (1)
 	{
-		if (sophers->death >= sophers->philo_count + 1)
+		if (atomic_load(&sophers->death) >= sophers->philo_count)
 			break ;
 		// if(sophers->eat_count != NA)
 		// 	if (sophers->end >= sophers->philo_count + 1)
