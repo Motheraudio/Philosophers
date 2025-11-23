@@ -68,8 +68,8 @@ void join_prev_threads(t_philo *sophers, ssize_t i)
 	j = 0;
 	while (j < i)
 	{
-		printf("joining %zu\n", j);
 		pthread_join(sophers->philosophers[j], NULL);
+		printf("joining %zu\n", j);
 		j++;
 	}
 	free(sophers->philosophers);
@@ -111,7 +111,7 @@ int	loop_infinite(t_philo *sophers)
 		return (0);
 	while (atomic_load(&sophers->start) != sophers->philo_count + 1)
 		usleep(1);
-	usleep(0);
+	// usleep(0);
 	// while (1)
 	// {
 	// 	if (atomic_load(&sophers->death) >= sophers->philo_count)

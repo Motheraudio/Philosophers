@@ -39,13 +39,27 @@ void	give_forks(t_philo *sophers, int i)
 	sophers->ids[i].print_mutex = &sophers->forks[0];
 	if (i == 0)
 		return ;
-	sophers->ids[i].forks[0] = &sophers->forks[i];
 	if (i == 1)
+	{
+		sophers->ids[i].forks[0] = &sophers->forks[sophers->philo_count];
+		sophers->ids[i].forks[1] = &sophers->forks[i];
+	}
+	if (i == sophers->philo_count)
+	{
 		sophers->ids[i].forks[1] = &sophers->forks[sophers->philo_count];
-	else if (i == sophers->philo_count)
-		sophers->ids[i].forks[1] = &sophers->forks[1];
+		sophers->ids[i].forks[0] = &sophers->forks[i];
+	}
 	else
-		sophers->ids[i].forks[1] = &sophers->forks[i + 1];
+	{
+	sophers->ids[i].forks[1] = &sophers->forks[i];
+	// sophers->ids[i].forks[0] = &sophers->forks[i];
+	// if (i == 1)
+	// 	sophers->ids[i].forks[1] = &sophers->forks[sophers->philo_count];
+	// else if (i == sophers->philo_count)
+	// 	sophers->ids[i].forks[1] = &sophers->forks[1];
+	// else
+	sophers->ids[i].forks[0] = &sophers->forks[i + 1];
+	}
 
 }
 
