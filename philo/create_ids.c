@@ -47,7 +47,7 @@ void	give_forks(t_philo *sophers, int i)
 	if (i == sophers->philo_count)
 	{
 		sophers->ids[i].forks[1] = &sophers->forks[sophers->philo_count];
-		sophers->ids[i].forks[0] = &sophers->forks[i];
+		sophers->ids[i].forks[0] = &sophers->forks[i - 1];
 	}
 	else
 	{
@@ -213,7 +213,7 @@ void	pick_forks(t_id *cast_id, atomic_size_t *time)
 	// // 	pthread_mutex_unlock(cast_id->forks[1]);
 	// // 	pthread_mutex_unlock(cast_id->forks[0]);
 	// // }
-		//cast_id->times_eaten++;
+		cast_id->times_eaten++;
 }
 void	*eat_routine(void *ids)
 {
