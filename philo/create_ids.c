@@ -152,37 +152,68 @@ void	*sleep_routine(void* ids)
 
 void	pick_forks(t_id *cast_id, atomic_size_t *time)
 {
-	if (cast_id->number % 2 == 0)
+	pthread_mutex_t *first;
+	pthread_mutex_t *second;
+
+	if (cast_id->forks[0] < cast_id->forks[1])
 	{
-		pthread_mutex_lock(cast_id->forks[0]);
-		get_time_atomic(time);
-		print_mutex(cast_id, FORK, *time);
-		get_time_atomic(time);
-		pthread_mutex_lock(cast_id->forks[1]);
-		print_mutex(cast_id, FORK, *time);
-		get_time_atomic(time);
-		print_mutex(cast_id, EAT, *time);
-		cast_id->last_ate = *time;
-		usleep(*cast_id->tte);
-		pthread_mutex_unlock(cast_id->forks[0]);
-		pthread_mutex_unlock(cast_id->forks[1]);
+		first = cast_id->forks[0];
+		second = cast_id->forks[1];
 	}
 	else
 	{
-		pthread_mutex_lock(cast_id->forks[1]);
-		get_time_atomic(time);
-		print_mutex(cast_id, FORK, *time);
-		get_time_atomic(time);
-		pthread_mutex_lock(cast_id->forks[0]);
-		print_mutex(cast_id, FORK, *time);
-		get_time_atomic(time);
-		print_mutex(cast_id, EAT, *time);
-		cast_id->last_ate = *time;
-		usleep(*cast_id->tte);
-		pthread_mutex_unlock(cast_id->forks[1]);
-		pthread_mutex_unlock(cast_id->forks[0]);
+		first = cast_id->forks[1];
+		second = cast_id->forks[0];
 	}
-		cast_id->times_eaten++;
+
+	pthread_mutex_lock(first);
+	get_time_atomic(time);
+	print_mutex(cast_id, FORK, *time);
+
+	pthread_mutex_lock(second);
+	get_time_atomic(time);
+	print_mutex(cast_id, FORK, *time);
+
+	get_time_atomic(time);
+	print_mutex(cast_id, EAT, *time);
+	cast_id->last_ate = *time;
+	usleep(*cast_id->tte);
+
+	pthread_mutex_unlock(second);
+	pthread_mutex_unlock(first);
+
+	cast_id->times_eaten++;
+	// // if (cast_id->number % 2 == 0)
+	// // {
+	// 	pthread_mutex_lock(cast_id->forks[0]);
+	// 	get_time_atomic(time);
+	// 	print_mutex(cast_id, FORK, *time);
+	// 	get_time_atomic(time);
+	// 	pthread_mutex_lock(cast_id->forks[1]);
+	// 	print_mutex(cast_id, FORK, *time);
+	// 	get_time_atomic(time);
+	// 	print_mutex(cast_id, EAT, *time);
+	// 	cast_id->last_ate = *time;
+	// 	usleep(*cast_id->tte);
+	// 	pthread_mutex_unlock(cast_id->forks[0]);
+	// 	pthread_mutex_unlock(cast_id->forks[1]);
+	// // }
+	// // else
+	// // {
+	// // 	pthread_mutex_lock(cast_id->forks[1]);
+	// // 	get_time_atomic(time);
+	// // 	print_mutex(cast_id, FORK, *time);
+	// // 	get_time_atomic(time);
+	// // 	pthread_mutex_lock(cast_id->forks[0]);
+	// // 	print_mutex(cast_id, FORK, *time);
+	// // 	get_time_atomic(time);
+	// // 	print_mutex(cast_id, EAT, *time);
+	// // 	cast_id->last_ate = *time;
+	// // 	usleep(*cast_id->tte);
+	// // 	pthread_mutex_unlock(cast_id->forks[1]);
+	// // 	pthread_mutex_unlock(cast_id->forks[0]);
+	// // }
+		//cast_id->times_eaten++;
 }
 void	*eat_routine(void *ids)
 {
