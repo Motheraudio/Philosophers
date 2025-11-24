@@ -35,7 +35,7 @@ int	get_time_atomic(atomic_size_t *ustime)
 
 	if (gettimeofday(&start_time, NULL) == -1)
 		return (ft_putstr_fd("how did u break gettimeofday", 2), 0);
-	atomic_init(ustime,
+	atomic_store(ustime,
 		start_time.tv_sec * 1000000 + start_time.tv_usec);
 	return (1);
 }
