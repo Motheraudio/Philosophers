@@ -43,13 +43,14 @@ int	pick_forks(t_id *cast_id, atomic_size_t *time)
 	get_time_atomic(time);
 	if (atomic_load(cast_id->ttd) <= atomic_load(time)
 		- atomic_load(&cast_id->last_ate))
-		return (pthread_mutex_unlock(second), pthread_mutex_unlock(first), 0);
+		return (pthread_mutex_unlock(first), 0);
 	print_mutex(cast_id, FORK, atomic_load(time));
 	pthread_mutex_lock(second);
 	get_time_atomic(time);
 	if (atomic_load(cast_id->ttd) <= atomic_load(time)
 		- atomic_load(&cast_id->last_ate))
 		return (pthread_mutex_unlock(second), pthread_mutex_unlock(first), 0);
+	atomic_store(&cast_id->last_ate, atomic_load(time));
 	print_mutex(cast_id, FORK, atomic_load(time));
 	print_mutex(cast_id, EAT, atomic_load(time));
 	get_time_atomic(time);
@@ -58,6 +59,5 @@ int	pick_forks(t_id *cast_id, atomic_size_t *time)
 		return (pthread_mutex_unlock(second), pthread_mutex_unlock(first), 0);
 	usleep(atomic_load(cast_id->tte));
 	get_time_atomic(time);
-	atomic_store(&cast_id->last_ate, atomic_load(time));
 	return (finish_ate(cast_id, first, second), 1);
 }
