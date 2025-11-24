@@ -6,7 +6,7 @@
 /*   By: alvcampo <alvcampo@student.42vienna.com>   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/24 18:58:34 by alvcampo          #+#    #+#             */
-/*   Updated: 2025/11/24 19:20:51 by alvcampo         ###   ########.fr       */
+/*   Updated: 2025/11/24 19:40:34 by alvcampo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,25 +54,26 @@ void	*sleep_routine(void *ids)
 {
 	t_id			*cast_id;
 	atomic_size_t	time;
+
 	cast_id = (t_id *) ids;
 	get_time_atomic(&time);
 	print_mutex(cast_id, SLEEP, time);
 	if (atomic_load(cast_id->death) > 0)
-		return(NULL);
+		return (NULL);
 	if (*cast_id->ttd <= time - cast_id->last_ate)
-		return (atomic_fetch_add(cast_id->death, 1), 
+		return (atomic_fetch_add(cast_id->death, 1),
 			print_mutex(cast_id, DIE, time), NULL);
 	usleep(*cast_id->tts);
 	get_time_atomic(&time);
 	if (atomic_load(cast_id->death) > 0)
-		return(NULL);
+		return (NULL);
 	if (*cast_id->ttd <= time - cast_id->last_ate)
-		return (atomic_fetch_add(cast_id->death, 1), 
+		return (atomic_fetch_add(cast_id->death, 1),
 			print_mutex(cast_id, DIE, time), NULL);
-	return(think_routine(cast_id));
+	return (think_routine(cast_id));
 }
 
-void *one_philo_routine(void *ids)
+void	*one_philo_routine(void *ids)
 {
 	t_id			*cast_id;
 	atomic_size_t	time;
@@ -96,18 +97,17 @@ void	*eat_routine(void *ids)
 	cast_id = (t_id *) ids;
 	get_time_atomic(&time);
 	if (atomic_load(cast_id->death) > 0)
-		return(NULL);
+		return (NULL);
 	if (!pick_forks(cast_id, &time))
 		return (atomic_fetch_add(cast_id->death, 1),
 			print_mutex(cast_id, DIE, time), NULL);
 	if (atomic_load(cast_id->death) > 0)
-		return(NULL);
+		return (NULL);
 	if (*cast_id->ttd <= time - cast_id->last_ate)
 		return (atomic_fetch_add(cast_id->death, 1),
 			print_mutex(cast_id, DIE, time), NULL);
-	if (*cast_id->eat_count != NA && 
-			cast_id->times_eaten == *cast_id->eat_count)
-		return(atomic_fetch_add(cast_id->end, 1), NULL);
-	return(sleep_routine(cast_id));
+	if (*cast_id->eat_count != NA
+		&& cast_id->times_eaten == *cast_id->eat_count)
+		return (atomic_fetch_add(cast_id->end, 1), NULL);
+	return (sleep_routine(cast_id));
 }
-
