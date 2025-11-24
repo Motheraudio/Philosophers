@@ -1,29 +1,113 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   routines.c                                         :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: alvcampo <alvcampo@student.42vienna.com>   +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/11/24 18:58:34 by alvcampo          #+#    #+#             */
+/*   Updated: 2025/11/24 19:20:51 by alvcampo         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "philo.h"
-void	*ft_memcpy(void *dst, const void *src, size_t n)
-{
-	unsigned char	*tmp_dst;
-	unsigned char	*tmp_src;
 
-	tmp_dst = (unsigned char *)dst;
-	tmp_src = (unsigned char *)src;
-	while (n > 0)
-	{
-		*tmp_dst = *tmp_src;
-		tmp_dst++;
-		tmp_src++;
-		n--;
-	}
-	return (dst);
-}
-int	get_time_start(t_id *id)
+void	*think_routine(void *ids)
 {
-	struct timeval	curr_time;
+	t_id			*cast_id;
+	atomic_size_t	time;
 
-	if (gettimeofday(&curr_time, NULL) == -1)
-		return (ft_putstr_fd("how did u break gettimeofday", 2), 0); // free and kill mutexes!
-	atomic_init(id->start_time,
-		curr_time.tv_sec * 1000000 + curr_time.tv_usec); // this is in microseconds, for printing ineed miliseconds
-	return (1);
+	cast_id = (t_id *) ids;
+	get_time_atomic(&time);
+	if (atomic_load(cast_id->death) > 0)
+		return (NULL);
+	if (*cast_id->ttd <= time - cast_id->last_ate)
+		return (atomic_fetch_add(cast_id->death, 1),
+			print_mutex(cast_id, DIE, time), NULL);
+	print_mutex(cast_id, THINK, time);
+	usleep(*cast_id->ttt);
+	get_time_atomic(&time);
+	if (atomic_load(cast_id->death) > 0)
+		return (NULL);
+	if (*cast_id->ttd <= time - cast_id->last_ate)
+		return (atomic_fetch_add(cast_id->death, 1),
+			print_mutex(cast_id, DIE, time), NULL);
+	return (eat_routine(cast_id));
 }
 
+void	*test_routine(void *ids)
+{
+	t_id	*cast_id;
+
+	cast_id = (t_id *) ids;
+	if (*cast_id->eat_count == NA)
+		while (atomic_load(cast_id->death) == 0)
+			usleep(1);
+	else
+		while (atomic_load(cast_id->death) == 0
+			&& atomic_load(cast_id->end) == 0)
+			usleep(1);
+	return (NULL);
+}
+
+void	*sleep_routine(void *ids)
+{
+	t_id			*cast_id;
+	atomic_size_t	time;
+	cast_id = (t_id *) ids;
+	get_time_atomic(&time);
+	print_mutex(cast_id, SLEEP, time);
+	if (atomic_load(cast_id->death) > 0)
+		return(NULL);
+	if (*cast_id->ttd <= time - cast_id->last_ate)
+		return (atomic_fetch_add(cast_id->death, 1), 
+			print_mutex(cast_id, DIE, time), NULL);
+	usleep(*cast_id->tts);
+	get_time_atomic(&time);
+	if (atomic_load(cast_id->death) > 0)
+		return(NULL);
+	if (*cast_id->ttd <= time - cast_id->last_ate)
+		return (atomic_fetch_add(cast_id->death, 1), 
+			print_mutex(cast_id, DIE, time), NULL);
+	return(think_routine(cast_id));
+}
+
+void *one_philo_routine(void *ids)
+{
+	t_id			*cast_id;
+	atomic_size_t	time;
+
+	cast_id = (t_id *) ids;
+	get_time_atomic(&time);
+	pthread_mutex_lock(cast_id->forks[0]);
+	print_mutex(cast_id, FORK, time);
+	usleep(*cast_id->ttd);
+	get_time_atomic(&time);
+	print_mutex(cast_id, DIE, time);
+	atomic_fetch_add(cast_id->death, 1);
+	return (NULL);
+}
+
+void	*eat_routine(void *ids)
+{
+	t_id			*cast_id;
+	atomic_size_t	time;
+
+	cast_id = (t_id *) ids;
+	get_time_atomic(&time);
+	if (atomic_load(cast_id->death) > 0)
+		return(NULL);
+	if (!pick_forks(cast_id, &time))
+		return (atomic_fetch_add(cast_id->death, 1),
+			print_mutex(cast_id, DIE, time), NULL);
+	if (atomic_load(cast_id->death) > 0)
+		return(NULL);
+	if (*cast_id->ttd <= time - cast_id->last_ate)
+		return (atomic_fetch_add(cast_id->death, 1),
+			print_mutex(cast_id, DIE, time), NULL);
+	if (*cast_id->eat_count != NA && 
+			cast_id->times_eaten == *cast_id->eat_count)
+		return(atomic_fetch_add(cast_id->end, 1), NULL);
+	return(sleep_routine(cast_id));
+}
 

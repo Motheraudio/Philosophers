@@ -6,7 +6,7 @@
 /*   By: alvcampo <alvcampo@student.42vienna.com>   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/09 09:51:41 by alvcampo          #+#    #+#             */
-/*   Updated: 2025/11/09 19:09:13 by alvcampo         ###   ########.fr       */
+/*   Updated: 2025/11/24 19:12:25 by alvcampo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,7 @@
 void	destroy_prev_forks(t_philo *sophers, ssize_t i)
 {
 	ssize_t	j;
-	
+
 	j = -1;
 	while (++j < i)
 		pthread_mutex_destroy(&sophers->forks[j]);

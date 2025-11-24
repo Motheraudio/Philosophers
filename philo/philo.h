@@ -6,29 +6,26 @@
 /*   By: alvcampo <alvcampo@student.42vienna.com>   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/09 10:04:10 by alvcampo          #+#    #+#             */
-/*   Updated: 2025/11/09 18:38:35 by alvcampo         ###   ########.fr       */
+/*   Updated: 2025/11/24 19:18:15 by alvcampo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef PHILO_H
 # define PHILO_H
 # define NA -1
-# define ZZ 2
-# define RIP 3
 # define FORK 1
 # define EAT 2
 # define SLEEP 3
 # define THINK 4
 # define DIE 5
-# define LEFT 0
-# define RIGHT 1
 # include <stdlib.h>
 # include <pthread.h>
 # include <stdatomic.h>
 # include <unistd.h>
 # include <sys/time.h>
 # include <string.h>
-#include <stdio.h>
+# include <stdio.h>
+
 typedef struct s_id
 {
 	atomic_int		number;
@@ -40,7 +37,7 @@ typedef struct s_id
 	atomic_size_t	*ttd;
 	atomic_size_t	*ttt;
 	atomic_int		*eat_count;
-	pthread_mutex_t *forks[2];
+	pthread_mutex_t	*forks[2];
 	atomic_int		*start;
 	atomic_int		*death;
 	atomic_int		*end;
@@ -75,19 +72,29 @@ size_t	ft_strlen(const char *s);
 int		ft_atoi(const char *str);
 void	ft_putstr_fd(char *s, int fd);
 size_t	ft_strlcpy(char *dst, const char *src, size_t size);
+void	*ft_memcpy(void *dst, const void *src, size_t n);
 					/* Fork creation */
 void	destroy_prev_forks(t_philo *sophers, ssize_t i);
 int		create_forks(t_philo *sophers);
 
 					/* ID creation */
 int		create_ids(t_philo *sophers);
-
 					/* Routines */
-void	*test_routine(void* ids);
-void	*think_routine(void* ids);
-void	*sleep_routine(void* ids);
+void	*test_routine(void *ids);
+void	*think_routine(void *ids);
+void	*sleep_routine(void *ids);
 void	*eat_routine(void *ids);
-
+void	*start_routine(void *ids);
+void	*one_philo_routine(void *ids);
+int		pick_forks(t_id *cast_id, atomic_size_t *time);
+void	select_fork(t_id *cast_id, pthread_mutex_t **f, pthread_mutex_t **s);
 					/* Time */
 int		get_time_atomic(atomic_size_t *ustime);
+					/* Threads */
+int		create_philos(t_philo *sophers);
+void	join_prev_threads(t_philo *sophers, ssize_t i);
+int		init_threads(t_philo *sophers);
+					/* Print */
+void	print_mutex(t_id *ids, int message, atomic_size_t time);
+
 #endif
