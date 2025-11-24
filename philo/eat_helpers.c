@@ -6,7 +6,7 @@
 /*   By: alvcampo <alvcampo@student.42vienna.com>   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/24 19:04:43 by alvcampo          #+#    #+#             */
-/*   Updated: 2025/11/24 19:15:12 by alvcampo         ###   ########.fr       */
+/*   Updated: 2025/11/24 20:12:23 by alvcampo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,6 +26,13 @@ void	select_fork(t_id *cast_id, pthread_mutex_t **f, pthread_mutex_t **s)
 	}
 }
 
+static void	finish_ate(t_id *cast_id, pthread_mutex_t *f, pthread_mutex_t *s)
+{
+	pthread_mutex_unlock(s);
+	pthread_mutex_unlock(f);
+	atomic_fetch_add(&cast_id->times_eaten, 1);
+}
+
 int	pick_forks(t_id *cast_id, atomic_size_t *time)
 {
 	pthread_mutex_t	*first;
@@ -34,23 +41,23 @@ int	pick_forks(t_id *cast_id, atomic_size_t *time)
 	select_fork(cast_id, &first, &second);
 	pthread_mutex_lock(first);
 	get_time_atomic(time);
-	if (*cast_id->ttd <= *time - cast_id->last_ate)
+	if (atomic_load(cast_id->ttd) <= atomic_load(time)
+		- atomic_load(&cast_id->last_ate))
 		return (pthread_mutex_unlock(second), pthread_mutex_unlock(first), 0);
-	print_mutex(cast_id, FORK, *time);
+	print_mutex(cast_id, FORK, atomic_load(time));
 	pthread_mutex_lock(second);
 	get_time_atomic(time);
-	if (*cast_id->ttd <= *time - cast_id->last_ate)
+	if (atomic_load(cast_id->ttd) <= atomic_load(time)
+		- atomic_load(&cast_id->last_ate))
 		return (pthread_mutex_unlock(second), pthread_mutex_unlock(first), 0);
-	print_mutex(cast_id, FORK, *time);
-	print_mutex(cast_id, EAT, *time);
+	print_mutex(cast_id, FORK, atomic_load(time));
+	print_mutex(cast_id, EAT, atomic_load(time));
 	get_time_atomic(time);
-	if (*cast_id->ttd <= *time - cast_id->last_ate)
+	if (atomic_load(cast_id->ttd) <= atomic_load(time)
+		- atomic_load(&cast_id->last_ate))
 		return (pthread_mutex_unlock(second), pthread_mutex_unlock(first), 0);
-	usleep(*cast_id->tte);
+	usleep(atomic_load(cast_id->tte));
 	get_time_atomic(time);
-	cast_id->last_ate = *time;
-	pthread_mutex_unlock(second);
-	pthread_mutex_unlock(first);
-	cast_id->times_eaten++;
-	return (1);
+	atomic_store(&cast_id->last_ate, atomic_load(time));
+	return (finish_ate(cast_id, first, second), 1);
 }
