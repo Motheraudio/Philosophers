@@ -94,6 +94,7 @@ int		get_time_atomic(atomic_size_t *ustime);
 int		create_philos(t_philo *sophers);
 void	join_prev_threads(t_philo *sophers, ssize_t i);
 int		init_threads(t_philo *sophers);
+int	my_usleep(t_id *cast_id, size_t ttw);
 					/* Print */
 void	print_mutex(t_id *ids, int message, atomic_size_t time);
 

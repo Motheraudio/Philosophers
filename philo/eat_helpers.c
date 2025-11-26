@@ -45,6 +45,7 @@ int	pick_forks(t_id *cast_id, atomic_size_t *time)
 		- atomic_load(&cast_id->last_ate))
 		return (pthread_mutex_unlock(first), 0);
 	print_mutex(cast_id, FORK, atomic_load(time));
+	// printf(" %i, fuck off\n", cast_id->number);
 	pthread_mutex_lock(second);
 	get_time_atomic(time);
 	if (atomic_load(cast_id->ttd) <= atomic_load(time)
@@ -53,11 +54,11 @@ int	pick_forks(t_id *cast_id, atomic_size_t *time)
 	atomic_store(&cast_id->last_ate, atomic_load(time));
 	print_mutex(cast_id, FORK, atomic_load(time));
 	print_mutex(cast_id, EAT, atomic_load(time));
-	get_time_atomic(time);
-	if (atomic_load(cast_id->ttd) <= atomic_load(time)
-		- atomic_load(&cast_id->last_ate))
+	// get_time_atomic(time);
+	// if (atomic_load(cast_id->ttd) <= atomic_load(time)
+	// 	- atomic_load(&cast_id->last_ate))
+	// 	return (pthread_mutex_unlock(second), pthread_mutex_unlock(first), 0);
+	if (!my_usleep(cast_id, atomic_load(cast_id->tte)))
 		return (pthread_mutex_unlock(second), pthread_mutex_unlock(first), 0);
-	usleep(atomic_load(cast_id->tte));
-	get_time_atomic(time);
 	return (finish_ate(cast_id, first, second), 1);
 }

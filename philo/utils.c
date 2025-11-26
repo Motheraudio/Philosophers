@@ -39,3 +39,32 @@ int	get_time_atomic(atomic_size_t *ustime)
 		start_time.tv_sec * 1000000 + start_time.tv_usec);
 	return (1);
 }
+
+int	my_usleep(t_id *cast_id, size_t ttw)
+{
+	atomic_size_t	time_rn;
+	size_t	i;
+	atomic_size_t	time_s;
+
+	i = 0;
+	get_time_atomic(&time_rn);
+	get_time_atomic(&time_s);
+	while(ttw >= atomic_load(&time_rn) - atomic_load(&time_s))
+	{
+		if (i % 50 == 0)
+		{
+			if (atomic_load(cast_id->death) > 0)
+				return (0);
+			if (atomic_load(cast_id->ttd) <= atomic_load(&time_rn)
+			- atomic_load(&cast_id->last_ate))
+		return (atomic_fetch_add(cast_id->death, 1),
+			print_mutex(cast_id, DIE, time_rn), 0);
+		}
+		usleep(20);
+		get_time_atomic(&time_rn);
+		// printf("%zu, %zu, %zu, %zu", ttw, time_rn, time_s, time_rn - time_s);
+		// exit(1);
+		i++;
+	}
+	return (1);
+}
