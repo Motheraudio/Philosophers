@@ -42,27 +42,32 @@ static void	give_forks(t_philo *sophers, int i)
 void	print_mutex(t_id *ids, char *message, atomic_size_t time)
 {
 	static atomic_int	printdeath = 0;
-	atomic_size_t		time_ms;
+	// size_t		time_ms;
 
-	pthread_mutex_lock(ids->print_mutex);
+	(void)time;
 	if (atomic_load(&printdeath) > 0)
 		return((void)pthread_mutex_unlock(ids->print_mutex));
+	pthread_mutex_lock(ids->print_mutex);
+	// printf("%zu\n", *ids->start_time);
 	// else if (message == EAT)
 	// 	printf("%zu %i is eating\n", time_ms, ids->number);
 	// else if (message == SLEEP)
 	// 	printf("%zu %i is sleeping\n", time_ms, ids->number);
 	// else if (message == THINK)
 	// 	printf("%zu %i is thinking\n", time_ms, ids->number);
-	atomic_store(&time_ms, (time - atomic_load(ids->start_time)) / 1000);
 	if (!message && atomic_load(&printdeath) == 0)
 	{
+		// time_ms = get_time();
+		//atomic_store(&time_ms, (atomic_load(&time) - atomic_load(ids->start_time)) / 1000);
 		atomic_fetch_add(&printdeath, 1);
-		printf("%zu %i died\n", atomic_load(&time_ms), ids->number);
+		printf("%zu %i died\n", (get_time() - ids->local_time) / 1000, ids->number);
 		usleep(300);
 	}
 	else if (message && atomic_load(&printdeath) == 0)
 	{
-		printf("%zu %i %s\n", atomic_load(&time_ms), ids->number, message);
+
+		// atomic_store(&time_ms, (time - atomic_load(ids->start_time)) / 1000);
+		printf("%zu %i %s\n",(get_time() - ids->local_time) / 1000, ids->number, message);
 	}
 		pthread_mutex_unlock(ids->print_mutex);
 }

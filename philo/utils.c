@@ -39,6 +39,14 @@ int	get_time_atomic(atomic_size_t *ustime)
 	return (1);
 }
 
+size_t	get_time()
+{
+	struct timeval	time;
+
+	gettimeofday(&time, NULL);
+	return(time.tv_sec * 1000000 + time.tv_usec);
+}
+
 int	my_usleep(t_id *cast_id, size_t ttw)
 {
 	atomic_size_t	time_rn;

@@ -47,7 +47,7 @@ typedef struct s_id
 	void			*(*start_routine)(void *t_id);
 	atomic_int		atomic_p_count;
 	size_t			timetothink;
-
+	size_t			local_time;
 }				t_id;
 
 typedef struct s_philo
@@ -93,6 +93,7 @@ int		pick_forks(t_id *cast_id, atomic_size_t *time);
 void	select_fork(t_id *cast_id, pthread_mutex_t **f, pthread_mutex_t **s);
 					/* Time */
 int		get_time_atomic(atomic_size_t *ustime);
+size_t	get_time(void);
 					/* Threads */
 int		create_philos(t_philo *sophers);
 void	join_prev_threads(t_philo *sophers, ssize_t i);

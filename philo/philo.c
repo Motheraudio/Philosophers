@@ -21,13 +21,14 @@ void	create_states(t_philo *sophers)
 
 void	*start_routine(void *ids)
 {
-	t_id			stack_ids;
+	t_id				stack_ids;
 	atomic_size_t			time;
 
 	ft_memcpy((void *)&stack_ids, ids, sizeof(t_id));
 	atomic_fetch_add(stack_ids.start, 1);
 	while (atomic_load(stack_ids.start) != stack_ids.atomic_p_count + 1)
 		usleep(1);
+	stack_ids.local_time = atomic_load(stack_ids.start_time);
 	get_time_atomic(&time);
 	atomic_store(&stack_ids.last_ate, atomic_load(&time));
 	// atomic_store(&stack_ids.last_ate, atomic_load(&time));
