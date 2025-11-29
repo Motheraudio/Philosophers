@@ -23,7 +23,7 @@ void	routine_loop_odds(void *ids)
 	{
 		if (i == 0)
 		{
-			my_usleep(cast_id, 20); //time to eat x 2 - tts <- impares, tte pares.]
+			my_usleep(cast_id, 1000); //time to eat x 2 - tts <- impares, tte pares.]
 			i++;
 		}
 		if (!think_routine(cast_id) && atomic_load(cast_id->death) != 0)

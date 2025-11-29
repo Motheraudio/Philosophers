@@ -51,16 +51,16 @@ int	my_usleep(t_id *cast_id, size_t ttw)
 	get_time_atomic(&time_s);
 	while(ttw > atomic_load(&time_rn) - atomic_load(&time_s))
 	{
-		if (i % 50 == 0)
+		if (i % 100 == 0)
 		{
 			if (atomic_load(cast_id->death) > 0)
 				return (0);
-			if (atomic_load(cast_id->ttd) < atomic_load(&time_rn)
+			if (atomic_load(cast_id->ttd) <= atomic_load(&time_rn)
 			- atomic_load(&cast_id->last_ate))
 			return (atomic_fetch_add(cast_id->death, 1),
 			print_mutex(cast_id, DIE, time_rn), 0);
 		}
-		usleep(50);
+		usleep(10);
 		get_time_atomic(&time_rn);
 		// printf("%i: %zu, %zu, %zu\n", cast_id->number, ttw, time_rn - time_s, atomic_load (cast_id->ttd));
 		// exit(1);
