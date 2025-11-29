@@ -17,7 +17,7 @@ static void	give_forks(t_philo *sophers, int i)
 	sophers->ids[i].print_mutex = &sophers->forks[0];
 	if (i == 0)
 		return ;
-	if (i == 1)
+	else if (i == 1)
 	{
 		sophers->ids[i].forks[0] = &sophers->forks[sophers->philo_count];
 		sophers->ids[i].forks[1] = &sophers->forks[1];
@@ -97,6 +97,11 @@ int	create_ids(t_philo *sophers)
 		sophers->ids[i].end = &sophers->end;
 		sophers->ids[i].start_time = &sophers->atomic_ustime;
 		sophers->ids[i].eat_count = &sophers->eat_count;
+		if (atomic_load(&sophers->ids[i].number) % 2 == 0)
+			sophers->ids[i].timetothink = sophers->tte;
+		else
+			sophers->ids[i].timetothink = sophers->tte * 2 - sophers->tts;
+	//time to eat x 2 - tts <- impares, tte pares.]
 		decide_start_routine(sophers, i);
 	}
 	return (1);

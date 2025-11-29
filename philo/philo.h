@@ -44,6 +44,7 @@ typedef struct s_id
 	pthread_mutex_t	*print_mutex;
 	void			*(*start_routine)(void *t_id);
 	atomic_int		atomic_p_count;
+	size_t			timetothink;
 
 }				t_id;
 

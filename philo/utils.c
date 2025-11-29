@@ -55,9 +55,9 @@ int	my_usleep(t_id *cast_id, size_t ttw)
 		{
 			if (atomic_load(cast_id->death) > 0)
 				return (0);
-			if (atomic_load(cast_id->ttd) <= atomic_load(&time_rn)
+			if (atomic_load(cast_id->ttd) < atomic_load(&time_rn)
 			- atomic_load(&cast_id->last_ate))
-		return (atomic_fetch_add(cast_id->death, 1),
+			return (atomic_fetch_add(cast_id->death, 1),
 			print_mutex(cast_id, DIE, time_rn), 0);
 		}
 		usleep(50);

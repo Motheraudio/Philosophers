@@ -33,6 +33,8 @@ void	*start_routine(void *ids)
 	// atomic_store(&stack_ids.last_ate, atomic_load(&time));
 	if (atomic_load(&stack_ids.atomic_p_count) == 1)
 		one_philo_routine(&stack_ids);
+	else if (stack_ids.number == 0)
+			test_routine(&stack_ids);
 	else if (stack_ids.number % 2 == 0)
 		routine_loop_even(&stack_ids);
 	else

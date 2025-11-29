@@ -23,7 +23,7 @@ void	routine_loop_odds(void *ids)
 	{
 		if (i == 0)
 		{
-			my_usleep(cast_id, 1000); //time to eat x 2 - tts <- impares, tte pares.]
+			my_usleep(cast_id, 20); //time to eat x 2 - tts <- impares, tte pares.]
 			i++;
 		}
 		if (!think_routine(cast_id) && atomic_load(cast_id->death) != 0)
@@ -64,7 +64,7 @@ void	*think_routine(void *ids)
 		return (atomic_fetch_add(cast_id->death, 1),
 			print_mutex(cast_id, DIE, time), NULL);
 	print_mutex(cast_id, THINK, time);
-	if (!my_usleep(cast_id, atomic_load(cast_id->ttt)))
+	if (!my_usleep(cast_id, cast_id->timetothink))
 		return (NULL);
 	// get_time_atomic(&time);
 	// if (atomic_load(cast_id->death) > 0)
