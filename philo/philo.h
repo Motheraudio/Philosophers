@@ -18,6 +18,8 @@
 # define SLEEP 3
 # define THINK 4
 # define DIE 5
+# define LEFT 1
+# define RIGHT 0
 # include <stdlib.h>
 # include <pthread.h>
 # include <stdatomic.h>
@@ -29,7 +31,7 @@
 typedef struct s_id
 {
 	atomic_int		number;
-	atomic_size_t	last_ate;
+	atomic_size_t			last_ate;
 	atomic_int		times_eaten;
 	atomic_size_t	*start_time;
 	atomic_size_t	*tte;
@@ -97,7 +99,7 @@ void	join_prev_threads(t_philo *sophers, ssize_t i);
 int		init_threads(t_philo *sophers);
 int	my_usleep(t_id *cast_id, size_t ttw);
 					/* Print */
-void	print_mutex(t_id *ids, int message, atomic_size_t time);
+void	print_mutex(t_id *ids, char *message, atomic_size_t time);
 					/* loops */
 void	routine_loop_odds(void *ids);
 void	routine_loop_even(void *ids);

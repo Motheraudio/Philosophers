@@ -22,23 +22,27 @@ void	create_states(t_philo *sophers)
 void	*start_routine(void *ids)
 {
 	t_id			stack_ids;
-	atomic_size_t	time;
+	atomic_size_t			time;
 
 	ft_memcpy((void *)&stack_ids, ids, sizeof(t_id));
 	atomic_fetch_add(stack_ids.start, 1);
 	while (atomic_load(stack_ids.start) != stack_ids.atomic_p_count + 1)
 		usleep(1);
 	get_time_atomic(&time);
-	stack_ids.last_ate = time;
+	atomic_store(&stack_ids.last_ate, atomic_load(&time));
 	// atomic_store(&stack_ids.last_ate, atomic_load(&time));
-	if (atomic_load(&stack_ids.atomic_p_count) == 1)
-		one_philo_routine(&stack_ids);
-	else if (stack_ids.number == 0)
+	if (stack_ids.number == 0)
 			test_routine(&stack_ids);
+	else if (atomic_load(&stack_ids.atomic_p_count) == 1)
+		one_philo_routine(&stack_ids);
 	else if (stack_ids.number % 2 == 0)
+	{
 		routine_loop_even(&stack_ids);
+	}
 	else
+	{
 		routine_loop_odds(&stack_ids);
+	}
 	return (NULL);
 }
 
@@ -49,7 +53,7 @@ int	loop_infinite(t_philo *sophers)
 	if (!get_time_atomic(&sophers->atomic_ustime))
 		return (0);
 	while (atomic_load(&sophers->start) != sophers->philo_count + 1)
-		usleep(1);
+		usleep(10);
 	return (1);
 }
 

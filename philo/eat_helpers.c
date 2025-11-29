@@ -14,15 +14,15 @@
 
 void	select_fork(t_id *cast_id, pthread_mutex_t **f, pthread_mutex_t **s)
 {
-	if (cast_id->forks[0] < cast_id->forks[1])
-	{
-		*f = cast_id->forks[0];
-		*s = cast_id->forks[1];
-	}
-	else
+	if (cast_id->number == atomic_load(&cast_id->atomic_p_count))
 	{
 		*f = cast_id->forks[1];
 		*s = cast_id->forks[0];
+	}
+	else
+	{
+		*f = cast_id->forks[0];
+		*s = cast_id->forks[1];
 	}
 }
 
@@ -41,19 +41,17 @@ int	pick_forks(t_id *cast_id, atomic_size_t *time)
 	select_fork(cast_id, &first, &second);
 	pthread_mutex_lock(first);
 	get_time_atomic(time);
-	if (atomic_load(cast_id->ttd) <= atomic_load(time)
+	if (atomic_load(cast_id->ttd) <= atomic_load(time) 
 		- atomic_load(&cast_id->last_ate))
 		return (pthread_mutex_unlock(first), 0);
-	print_mutex(cast_id, FORK, atomic_load(time));
-	// printf(" %i, fuck off\n", cast_id->number);
+	print_mutex(cast_id, "has taken a fork", atomic_load(time));
 	pthread_mutex_lock(second);
 	get_time_atomic(time);
-	if (atomic_load(cast_id->ttd) <= atomic_load(time)
-		- atomic_load(&cast_id->last_ate))
+	if (atomic_load(cast_id->ttd) <= atomic_load(time) - atomic_load(&cast_id->last_ate))
 		return (pthread_mutex_unlock(second), pthread_mutex_unlock(first), 0);
-	atomic_store(&cast_id->last_ate, atomic_load(time));
-	print_mutex(cast_id, FORK, atomic_load(time));
-	print_mutex(cast_id, EAT, atomic_load(time));
+	cast_id->last_ate = atomic_load(time);
+	print_mutex(cast_id, "has taken a fork", atomic_load(time));
+	print_mutex(cast_id, "is eating", atomic_load(time));
 	// get_time_atomic(time);
 	// if (atomic_load(cast_id->ttd) <= atomic_load(time)
 	// 	- atomic_load(&cast_id->last_ate))

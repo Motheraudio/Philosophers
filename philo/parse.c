@@ -74,11 +74,10 @@ int	parse_and_store(t_philo *sophers, int argc, char **argv)
 	atomic_init(&(sophers->ttd), ft_atoi(argv[2]) * 1000);
 	atomic_init(&(sophers->tte), ft_atoi(argv[3]) * 1000);
 	atomic_init(&(sophers->tts), ft_atoi(argv[4]) * 1000);
-	atomic_init(&(sophers->ttt), 0);
-	// if (sophers->philo_count % 2 == 0)
-	// 	atomic_init(&(sophers->ttt), sophers->tte);
-	// else
-	// 	atomic_init(&(sophers->ttt), sophers->tte * 2 - sophers->tts);
+	if (sophers->philo_count % 2 == 0)
+		atomic_init(&(sophers->ttt), 1);
+	else
+		atomic_init(&(sophers->ttt), (sophers->tte * 2 - sophers->tts));
 	if (argc == 6)
 		atomic_init(&(sophers->eat_count), ft_atoi(argv[5]));
 	if (argc == 5)
