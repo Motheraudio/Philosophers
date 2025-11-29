@@ -12,6 +12,44 @@
 
 #include "philo.h"
 
+void	routine_loop_odds(void *ids)
+{
+	t_id		*cast_id;
+	size_t		i;
+	
+	cast_id = (t_id *)ids;
+	i = 0;
+	while(1)
+	{
+		if (i == 0)
+		{
+			my_usleep(cast_id, 1000); //time to eat x 2 - tts <- impares, tte pares.]
+			i++;
+		}
+		if (!think_routine(cast_id) && atomic_load(cast_id->death) != 0)
+			return ;
+		if (!eat_routine(cast_id) && atomic_load(cast_id->death) != 0)
+			return ;
+		if (!sleep_routine(cast_id) && atomic_load(cast_id->death) != 0)
+			return ;
+	}
+}
+
+void	routine_loop_even(void *ids)
+{
+	t_id		*cast_id;
+	
+	cast_id = (t_id *)ids;
+	while(1)
+	{
+		if (!eat_routine(cast_id) && atomic_load(cast_id->death) != 0)
+			return ;
+		if (!think_routine(cast_id) && atomic_load(cast_id->death) != 0)
+			return ;
+		if (!sleep_routine(cast_id) && atomic_load(cast_id->death) != 0)
+			return ;
+	}
+}
 void	*think_routine(void *ids)
 {
 	t_id			*cast_id;
@@ -35,7 +73,7 @@ void	*think_routine(void *ids)
 	// 	- atomic_load(&cast_id->last_ate))
 	// 	return (atomic_fetch_add(cast_id->death, 1),
 	// 		print_mutex(cast_id, DIE, time), NULL);
-	return (eat_routine(cast_id));
+	return (NULL);
 }
 
 void	*test_routine(void *ids)
@@ -76,7 +114,7 @@ void	*sleep_routine(void *ids)
 	// 	- atomic_load(&cast_id->last_ate))
 	// 	return (atomic_fetch_add(cast_id->death, 1),
 	// 		print_mutex(cast_id, DIE, time), NULL);
-	return (think_routine(cast_id));
+	return (NULL);
 }
 
 void	*one_philo_routine(void *ids)
@@ -111,5 +149,5 @@ void	*eat_routine(void *ids)
 		&& atomic_load(&cast_id->times_eaten)
 		== atomic_load(cast_id->eat_count))
 		return (atomic_fetch_add(cast_id->end, 1), NULL);
-	return (sleep_routine(cast_id));
+	return (NULL);
 }

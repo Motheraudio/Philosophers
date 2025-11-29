@@ -30,7 +30,14 @@ void	*start_routine(void *ids)
 		usleep(1);
 	get_time_atomic(&time);
 	stack_ids.last_ate = time;
-	return (stack_ids.start_routine((void *)&stack_ids));
+	// atomic_store(&stack_ids.last_ate, atomic_load(&time));
+	if (atomic_load(&stack_ids.atomic_p_count) == 1)
+		one_philo_routine(&stack_ids);
+	else if (stack_ids.number % 2 == 0)
+		routine_loop_even(&stack_ids);
+	else
+		routine_loop_odds(&stack_ids);
+	return (NULL);
 }
 
 int	loop_infinite(t_philo *sophers)

@@ -97,5 +97,8 @@ int		init_threads(t_philo *sophers);
 int	my_usleep(t_id *cast_id, size_t ttw);
 					/* Print */
 void	print_mutex(t_id *ids, int message, atomic_size_t time);
+					/* loops */
+void	routine_loop_odds(void *ids);
+void	routine_loop_even(void *ids);
 
 #endif
