@@ -31,7 +31,7 @@
 typedef struct s_id
 {
 	atomic_int		number;
-	atomic_size_t			last_ate;
+	atomic_size_t	last_ate;
 	atomic_int		times_eaten;
 	atomic_size_t	*start_time;
 	atomic_size_t	*tte;
@@ -44,9 +44,7 @@ typedef struct s_id
 	atomic_int		*death;
 	atomic_int		*end;
 	pthread_mutex_t	*print_mutex;
-	void			*(*start_routine)(void *t_id);
 	atomic_int		atomic_p_count;
-	size_t			timetothink;
 	size_t			local_time;
 }				t_id;
 
@@ -98,7 +96,7 @@ size_t	get_time(void);
 int		create_philos(t_philo *sophers);
 void	join_prev_threads(t_philo *sophers, ssize_t i);
 int		init_threads(t_philo *sophers);
-int	my_usleep(t_id *cast_id, size_t ttw);
+int		my_usleep(t_id *cast_id, size_t ttw);
 					/* Print */
 void	print_mutex(t_id *ids, char *message);
 					/* loops */

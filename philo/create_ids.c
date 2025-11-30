@@ -27,7 +27,6 @@ static void	give_forks(t_philo *sophers, int i)
 void	print_mutex(t_id *ids, char *message)
 {
 	static atomic_int	printdeath = 0;
-	// size_t		time_ms;
 
 	if (atomic_load(&printdeath) > 0)
 		return ;
@@ -35,26 +34,16 @@ void	print_mutex(t_id *ids, char *message)
 	if (!message && atomic_load(&printdeath) == 0)
 	{
 		atomic_fetch_add(&printdeath, 1);
-		printf("%zu %i died\n", (get_time() - ids->local_time) / 1000, ids->number);
+		printf("%zu %i died\n", (get_time()
+				- ids->local_time) / 1000, ids->number);
 		usleep(300);
 	}
 	else if (message && atomic_load(&printdeath) == 0)
 	{
-		printf("%zu %i %s\n",(get_time() - ids->local_time) / 1000, ids->number, message);
+		printf("%zu %i %s\n", (get_time() - ids->local_time) / 1000,
+			ids->number, message);
 	}
-		pthread_mutex_unlock(ids->print_mutex);
-}
-
-static void	decide_start_routine(t_philo *sophers, ssize_t i)
-{
-	if (i == 0)
-		sophers->ids[i].start_routine = test_routine;
-	else if (sophers->philo_count == 1)
-		sophers->ids[i].start_routine = one_philo_routine;
-	else if (i % 2 == 0)
-		sophers->ids[i].start_routine = eat_routine;
-	else
-		sophers->ids[i].start_routine = think_routine;
+	pthread_mutex_unlock(ids->print_mutex);
 }
 
 int	create_ids(t_philo *sophers)
@@ -81,11 +70,6 @@ int	create_ids(t_philo *sophers)
 		sophers->ids[i].end = &sophers->end;
 		sophers->ids[i].start_time = &sophers->atomic_ustime;
 		sophers->ids[i].eat_count = &sophers->eat_count;
-		if (atomic_load(&sophers->ids[i].number) % 2 == 0)
-			sophers->ids[i].timetothink = 1;
-		else
-			sophers->ids[i].timetothink = sophers->tte * 2 - sophers->tts;
-		decide_start_routine(sophers, i);
 	}
 	return (1);
 }

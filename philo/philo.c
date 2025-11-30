@@ -19,6 +19,20 @@ void	create_states(t_philo *sophers)
 	atomic_init(&sophers->end, 0);
 }
 
+static void	which_routine(t_id *stack_ids)
+{
+	if (stack_ids->number == 0)
+		test_routine(stack_ids);
+	else if (atomic_load(&stack_ids->atomic_p_count) == 1)
+		one_philo_routine(stack_ids);
+	else if (stack_ids->number % 2 == 0)
+		routine_loop_even(stack_ids);
+	else if (stack_ids->number != atomic_load(&stack_ids->atomic_p_count))
+		routine_loop_odds(stack_ids);
+	else
+		routine_loop_last(stack_ids);
+}
+
 void	*start_routine(void *ids)
 {
 	t_id				stack_ids;
@@ -29,25 +43,14 @@ void	*start_routine(void *ids)
 	while (atomic_load(stack_ids.start) != stack_ids.atomic_p_count + 1)
 		usleep(1);
 	stack_ids.local_time = 0;
-	while(!stack_ids.local_time)
+	while (!stack_ids.local_time)
 	{
 		stack_ids.local_time = atomic_load(stack_ids.start_time);
 		usleep(1);
 	}
 	get_time_atomic(&time);
 	atomic_store(&stack_ids.last_ate, atomic_load(&time));
-	// atomic_store(&stack_ids.last_ate, atomic_load(&time));
-	if (stack_ids.number == 0)
-			test_routine(&stack_ids);
-	else if (atomic_load(&stack_ids.atomic_p_count) == 1)
-		one_philo_routine(&stack_ids);
-	else if (stack_ids.number % 2 == 0)
-		routine_loop_even(&stack_ids);
-	else if (stack_ids.number != atomic_load(&stack_ids.atomic_p_count))
-		routine_loop_odds(&stack_ids);
-	else
-		routine_loop_last(&stack_ids);
-	printf("hehe from %i\n", stack_ids.number);
+	which_routine(&stack_ids);
 	return (NULL);
 }
 

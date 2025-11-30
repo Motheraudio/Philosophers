@@ -41,12 +41,13 @@ int	pick_forks(t_id *cast_id, atomic_size_t *time)
 	(void) time;
 	select_fork(cast_id, &first, &second);
 	pthread_mutex_lock(first);
-	if (atomic_load(cast_id->ttd) <= get_time() 
+	if (atomic_load(cast_id->ttd) <= get_time()
 		- atomic_load(&cast_id->last_ate))
 		return (pthread_mutex_unlock(first), 0);
 	print_mutex(cast_id, "has taken a fork");
 	pthread_mutex_lock(second);
-	if (atomic_load(cast_id->ttd) <= get_time() - atomic_load(&cast_id->last_ate))
+	if (atomic_load(cast_id->ttd) <= get_time()
+		- atomic_load(&cast_id->last_ate))
 		return (pthread_mutex_unlock(second), pthread_mutex_unlock(first), 0);
 	cast_id->last_ate = get_time();
 	print_mutex(cast_id, "has taken a fork");

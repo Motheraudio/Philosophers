@@ -60,24 +60,29 @@ int	check_argv_for_ov_neg(char **argv)
 	return (1);
 }
 
-static ssize_t    set_think(t_philo *sophers)
+static ssize_t	set_think(t_philo *sophers)
 {
-	ssize_t	ttt;
-
+	long long	ttt;
 
 	if (sophers->philo_count % 2)
 	{
 		if (atomic_load(&sophers->tte) <= atomic_load(&sophers->tts))
 		{
-			ttt = (atomic_load(&sophers->tte) * 2 - atomic_load(&sophers->tts)) * (atomic_load(&sophers->tte) * 2 > atomic_load(&sophers->tts)) / 2;
+			ttt = (atomic_load(&sophers->tte) * 2 - atomic_load(&sophers->tts))
+				* (atomic_load(&sophers->tte)
+					* 2 > atomic_load(&sophers->tts)) / 2;
 		}
 		else
-			ttt = (atomic_load(&sophers->tte) - atomic_load(&sophers->tts)) * 3 / 2;
+			ttt = (atomic_load(&sophers->tte) - atomic_load(&sophers->tts))
+				* 3 / 2;
 	}
 	else
-		ttt =atomic_load(&sophers->tte)  -atomic_load(&sophers->tts) + 1000;
-	return(ttt);
+		ttt = atomic_load(&sophers->tte) - atomic_load(&sophers->tts) + 1000;
+	if (ttt < 0)
+		ttt *= -1;
+	return ((ssize_t)ttt);
 }
+
 int	parse_and_store(t_philo *sophers, int argc, char **argv)
 {
 	if (argc < 5 || argc > 6)
