@@ -70,7 +70,7 @@ byebye:(
 endef
 export RAT
 export GOODBYE
-SRCS = ft.c parse.c philo.c create_forks.c create_ids.c utils.c threads.c eat_helpers.c routines.c
+SRCS = ft.c parse.c philo.c create_forks.c create_ids.c utils.c threads.c eat_helpers.c routines.c loop_routines.c
 OBJECTS = ${SRCS:.c=.o}
 OBJDIR = obj
 OBJECTFILES = $(addprefix $(OBJDIR)/, $(OBJECTS))
