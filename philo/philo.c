@@ -59,7 +59,7 @@ int	loop_infinite(t_philo *sophers)
 	if (!init_threads(sophers))
 		return (0);
 	if (!get_time_atomic(&sophers->atomic_ustime))
-		return (0);
+		return (join_prev_threads(sophers, sophers->philo_count + 1), 0);
 	while (atomic_load(&sophers->start) != sophers->philo_count + 1)
 		usleep(10);
 	return (1);
@@ -78,7 +78,9 @@ int	main(int argc, char **argv)
 		return (destroy_prev_forks(&sophers, sophers.philo_count + 1), 1);
 	if (!create_ids(&sophers))
 		return (destroy_prev_forks(&sophers, sophers.philo_count + 1), 1);
-	loop_infinite(&sophers);
+	if (!loop_infinite(&sophers))
+		return (destroy_prev_forks(&sophers, sophers.philo_count + 1),
+			free(sophers.ids), 1);
 	join_prev_threads(&sophers, sophers.philo_count + 1);
 	free(sophers.ids);
 	destroy_prev_forks(&sophers, sophers.philo_count + 1);
