@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   philo.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: alvcampo <alvcampo@student.42vienna.com>   +#+  +:+       +#+        */
+/*   By: alvcampo <alvcampo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/09 09:57:36 by alvcampo          #+#    #+#             */
-/*   Updated: 2025/11/24 19:12:09 by alvcampo         ###   ########.fr       */
+/*   Updated: 2025/11/30 00:21:04 by alvcampo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,13 +22,18 @@ void	create_states(t_philo *sophers)
 void	*start_routine(void *ids)
 {
 	t_id				stack_ids;
-	atomic_size_t			time;
+	atomic_size_t		time;
 
 	ft_memcpy((void *)&stack_ids, ids, sizeof(t_id));
 	atomic_fetch_add(stack_ids.start, 1);
 	while (atomic_load(stack_ids.start) != stack_ids.atomic_p_count + 1)
 		usleep(1);
-	stack_ids.local_time = atomic_load(stack_ids.start_time);
+	stack_ids.local_time = 0;
+	while(!stack_ids.local_time)
+	{
+		stack_ids.local_time = atomic_load(stack_ids.start_time);
+		usleep(1);
+	}
 	get_time_atomic(&time);
 	atomic_store(&stack_ids.last_ate, atomic_load(&time));
 	// atomic_store(&stack_ids.last_ate, atomic_load(&time));
@@ -37,13 +42,11 @@ void	*start_routine(void *ids)
 	else if (atomic_load(&stack_ids.atomic_p_count) == 1)
 		one_philo_routine(&stack_ids);
 	else if (stack_ids.number % 2 == 0)
-	{
 		routine_loop_even(&stack_ids);
-	}
-	else
-	{
+	else if (stack_ids.number != atomic_load(&stack_ids.atomic_p_count))
 		routine_loop_odds(&stack_ids);
-	}
+	else
+		routine_loop_last(&stack_ids);
 	return (NULL);
 }
 

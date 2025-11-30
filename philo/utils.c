@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   utils.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: alvcampo <alvcampo@student.42vienna.com>   +#+  +:+       +#+        */
+/*   By: alvcampo <alvcampo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/24 19:10:21 by alvcampo          #+#    #+#             */
-/*   Updated: 2025/11/24 19:58:44 by alvcampo         ###   ########.fr       */
+/*   Updated: 2025/11/30 00:19:36 by alvcampo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,14 +49,14 @@ size_t	get_time()
 
 int	my_usleep(t_id *cast_id, size_t ttw)
 {
-	atomic_size_t	time_rn;
+	size_t	time_rn;
 	atomic_size_t	i;
-	atomic_size_t	time_s;
+	//atomic_size_t	time_s;
 
 	i = 0;
-	get_time_atomic(&time_rn);
-	get_time_atomic(&time_s);
-	while(ttw > time_rn - time_s)
+	time_rn = get_time();
+	//get_time_atomic(&time_s);
+	while(ttw > get_time() - time_rn)
 	{
 		if (i % 50 == 0)
 		{
@@ -64,10 +64,9 @@ int	my_usleep(t_id *cast_id, size_t ttw)
 				return (0);
 			if (atomic_load(cast_id->ttd) <= time_rn - cast_id->last_ate)
 				return (atomic_fetch_add(cast_id->death, 1),
-				print_mutex(cast_id, NULL, time_rn), 0);
+				print_mutex(cast_id, NULL), 0);
 		}
 		usleep(50);
-		get_time_atomic(&time_rn);
 		// printf("%i: %zu, %zu, %zu\n", cast_id->number, ttw, time_rn - time_s, atomic_load (cast_id->ttd));
 		// exit(1);
 		i++;

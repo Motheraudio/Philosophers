@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   eat_helpers.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: alvcampo <alvcampo@student.42vienna.com>   +#+  +:+       +#+        */
+/*   By: alvcampo <alvcampo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/24 19:04:43 by alvcampo          #+#    #+#             */
-/*   Updated: 2025/11/24 20:12:23 by alvcampo         ###   ########.fr       */
+/*   Updated: 2025/11/30 00:16:34 by alvcampo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,20 +38,19 @@ int	pick_forks(t_id *cast_id, atomic_size_t *time)
 	pthread_mutex_t	*first;
 	pthread_mutex_t	*second;
 
+	(void) time;
 	select_fork(cast_id, &first, &second);
 	pthread_mutex_lock(first);
-	get_time_atomic(time);
-	if (atomic_load(cast_id->ttd) <= atomic_load(time) 
+	if (atomic_load(cast_id->ttd) <= get_time() 
 		- atomic_load(&cast_id->last_ate))
 		return (pthread_mutex_unlock(first), 0);
-	print_mutex(cast_id, "has taken a fork", atomic_load(time));
+	print_mutex(cast_id, "has taken a fork");
 	pthread_mutex_lock(second);
-	get_time_atomic(time);
-	if (atomic_load(cast_id->ttd) <= atomic_load(time) - atomic_load(&cast_id->last_ate))
+	if (atomic_load(cast_id->ttd) <= get_time() - atomic_load(&cast_id->last_ate))
 		return (pthread_mutex_unlock(second), pthread_mutex_unlock(first), 0);
-	cast_id->last_ate = atomic_load(time);
-	print_mutex(cast_id, "has taken a fork", atomic_load(time));
-	print_mutex(cast_id, "is eating", atomic_load(time));
+	cast_id->last_ate = get_time();
+	print_mutex(cast_id, "has taken a fork");
+	print_mutex(cast_id, "is eating");
 	// get_time_atomic(time);
 	// if (atomic_load(cast_id->ttd) <= atomic_load(time)
 	// 	- atomic_load(&cast_id->last_ate))

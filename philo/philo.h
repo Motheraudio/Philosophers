@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   philo.h                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: alvcampo <alvcampo@student.42vienna.com>   +#+  +:+       +#+        */
+/*   By: alvcampo <alvcampo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/09 10:04:10 by alvcampo          #+#    #+#             */
-/*   Updated: 2025/11/24 19:18:15 by alvcampo         ###   ########.fr       */
+/*   Updated: 2025/11/30 00:17:11 by alvcampo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -100,9 +100,10 @@ void	join_prev_threads(t_philo *sophers, ssize_t i);
 int		init_threads(t_philo *sophers);
 int	my_usleep(t_id *cast_id, size_t ttw);
 					/* Print */
-void	print_mutex(t_id *ids, char *message, atomic_size_t time);
+void	print_mutex(t_id *ids, char *message);
 					/* loops */
 void	routine_loop_odds(void *ids);
 void	routine_loop_even(void *ids);
+void	routine_loop_last(void *ids);
 
 #endif

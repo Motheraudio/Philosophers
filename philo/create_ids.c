@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   create_ids.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: alvcampo <alvcampo@student.42vienna.com>   +#+  +:+       +#+        */
+/*   By: alvcampo <alvcampo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/09 18:22:12 by alvcampo          #+#    #+#             */
-/*   Updated: 2025/11/24 19:14:33 by alvcampo         ###   ########.fr       */
+/*   Updated: 2025/11/30 00:08:57 by alvcampo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,14 +39,13 @@ static void	give_forks(t_philo *sophers, int i)
 	// }
 }
 
-void	print_mutex(t_id *ids, char *message, atomic_size_t time)
+void	print_mutex(t_id *ids, char *message)
 {
 	static atomic_int	printdeath = 0;
 	// size_t		time_ms;
 
-	(void)time;
 	if (atomic_load(&printdeath) > 0)
-		return((void)pthread_mutex_unlock(ids->print_mutex));
+		return ;
 	pthread_mutex_lock(ids->print_mutex);
 	// printf("%zu\n", *ids->start_time);
 	// else if (message == EAT)

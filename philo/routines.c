@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   routines.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: alvcampo <alvcampo@student.42vienna.com>   +#+  +:+       +#+        */
+/*   By: alvcampo <alvcampo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/24 18:58:34 by alvcampo          #+#    #+#             */
-/*   Updated: 2025/11/24 20:02:53 by alvcampo         ###   ########.fr       */
+/*   Updated: 2025/11/30 00:21:51 by alvcampo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,15 +19,32 @@ void	routine_loop_odds(void *ids)
 	cast_id = (t_id *)ids;
 	while(1)
 	{
+		if (!think_routine(cast_id) && atomic_load(cast_id->death) != 0)
+			return ;
+		if (!eat_routine(cast_id) && atomic_load(cast_id->death) != 0)
+			return ;
+		if (!sleep_routine(cast_id) && atomic_load(cast_id->death) != 0)
+			return ;
+		usleep(1);
+	}
+}
+
+void	routine_loop_last(void *ids)
+{
+	t_id		*cast_id;
+	
+	cast_id = (t_id *)ids;
+	while(1)
+	{
 		if (!sleep_routine(cast_id) && atomic_load(cast_id->death) != 0)
 			return ;
 		if (!think_routine(cast_id) && atomic_load(cast_id->death) != 0)
 			return ;
 		if (!eat_routine(cast_id) && atomic_load(cast_id->death) != 0)
 			return ;
+		usleep(1);
 	}
 }
-
 void	routine_loop_even(void *ids)
 {
 	t_id		*cast_id;
@@ -41,30 +58,31 @@ void	routine_loop_even(void *ids)
 			return ;
 		if (!think_routine(cast_id) && atomic_load(cast_id->death) != 0)
 			return ;
+		usleep(1);
 	}
 }
 void	*think_routine(void *ids)
 {
 	t_id			*cast_id;
-	atomic_size_t			time;
+	
 
 	cast_id = (t_id *) ids;
-	get_time_atomic(&time);
+	//get_time_atomic(&time);
 	if (atomic_load(cast_id->death) > 0)
 		return (NULL);
-	if (atomic_load(cast_id->ttd) <= atomic_load(&time) - atomic_load(&cast_id->last_ate))
+	if (atomic_load(cast_id->ttd) <= get_time() - atomic_load(&cast_id->last_ate))
 		return (atomic_fetch_add(cast_id->death, 1),
-			print_mutex(cast_id, NULL, atomic_load(&time)), NULL);
-	print_mutex(cast_id, "is thinking", atomic_load(&time));
+			print_mutex(cast_id, NULL), NULL);
+	print_mutex(cast_id, "is thinking");
 	if (!my_usleep(cast_id, atomic_load(cast_id->ttt)))
 		return (NULL);
-	get_time_atomic(&time);
+	//get_time_atomic(&time);
 	if (atomic_load(cast_id->death) > 0)
 		return (NULL);
-	if (atomic_load(cast_id->ttd) <= atomic_load(&time) 
+	if (atomic_load(cast_id->ttd) <= get_time() 
 		- atomic_load(&cast_id->last_ate))
 		return (atomic_fetch_add(cast_id->death, 1),
-			print_mutex(cast_id, NULL, atomic_load(&time)), NULL);
+			print_mutex(cast_id, NULL), NULL);
 	return (NULL);
 }
 
@@ -86,16 +104,16 @@ void	*test_routine(void *ids)
 void	*sleep_routine(void *ids)
 {
 	t_id			*cast_id;
-	atomic_size_t			time;
+	
 
 	cast_id = (t_id *) ids;
-	get_time_atomic(&time);
+	//get_time_atomic(&time);
 	if (atomic_load(cast_id->death) > 0)
 		return (NULL);
-	if (atomic_load(cast_id->ttd) <= time - atomic_load(&cast_id->last_ate))
+	if (atomic_load(cast_id->ttd) <= get_time() - atomic_load(&cast_id->last_ate))
 		return (atomic_fetch_add(cast_id->death, 1),
-			print_mutex(cast_id, NULL, time), NULL);
-	print_mutex(cast_id, "is sleeping", atomic_load(&time));
+			print_mutex(cast_id, NULL), NULL);
+	print_mutex(cast_id, "is sleeping");
 		if (!my_usleep(cast_id, atomic_load(cast_id->tts)))
 		return (NULL);
 	return (NULL);
@@ -104,15 +122,15 @@ void	*sleep_routine(void *ids)
 void	*one_philo_routine(void *ids)
 {
 	t_id			*cast_id;
-	atomic_size_t	time;
+	//atomic_size_t	time;
 
 	cast_id = (t_id *) ids;
-	get_time_atomic(&time);
+	//get_time_atomic(&time);
 	pthread_mutex_lock(cast_id->forks[RIGHT]);
-	print_mutex(cast_id, "has taken a fork", atomic_load(&time));
+	print_mutex(cast_id, "has taken a fork");
 	usleep(atomic_load(cast_id->ttd));
-	get_time_atomic(&time);
-	print_mutex(cast_id, NULL, atomic_load(&time));
+	//get_time_atomic(&time);
+	print_mutex(cast_id, NULL);
 	pthread_mutex_unlock(cast_id->forks[RIGHT]);
 	atomic_fetch_add(cast_id->death, 1);
 	return (NULL);
@@ -121,15 +139,15 @@ void	*one_philo_routine(void *ids)
 void	*eat_routine(void *ids)
 {
 	t_id			*cast_id;
-	atomic_size_t			time;
+	
 
 	cast_id = (t_id *) ids;
-	get_time_atomic(&time);
+	//get_time_atomic(&time);
 	if (atomic_load(cast_id->death) > 0)
 		return (NULL);
-	if (!pick_forks(cast_id, &time))
+	if (!pick_forks(cast_id, NULL))
 		return (atomic_fetch_add(cast_id->death, 1),
-			print_mutex(cast_id, NULL, atomic_load(&time)), NULL);
+			print_mutex(cast_id, NULL), NULL);
 	if (atomic_load(cast_id->eat_count) != NA
 		&& atomic_load(&cast_id->times_eaten)
 		== atomic_load(cast_id->eat_count))
