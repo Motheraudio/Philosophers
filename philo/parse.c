@@ -92,8 +92,8 @@ int	parse_and_store(t_philo *sophers, int argc, char **argv)
 	if (check_argv_for_ov_neg(argv) == -1)
 		return (ft_putstr_fd("Negative or > INT_MAX not allowed\n", 2), -1);
 	sophers->philo_count = ft_atoi(argv[1]);
-	if (sophers->philo_count >= 1000)
-		return (ft_putstr_fd("Too much philosophers\n", 2), -1);
+	if (sophers->philo_count >= 1000 || sophers->philo_count == 0)
+		return (ft_putstr_fd("Too much/too little philosophers\n", 2), -1);
 	atomic_init(&(sophers->ttd), ft_atoi(argv[2]) * 1000 + 999);
 	atomic_init(&(sophers->tte), ft_atoi(argv[3]) * 1000);
 	atomic_init(&(sophers->tts), ft_atoi(argv[4]) * 1000);
