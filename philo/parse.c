@@ -75,7 +75,7 @@ static ssize_t    set_think(t_philo *sophers)
 			ttt = (atomic_load(&sophers->tte) - atomic_load(&sophers->tts)) * 3 / 2;
 	}
 	else
-		ttt =atomic_load(&sophers->tte)  -atomic_load(&sophers->tts) + 100;
+		ttt =atomic_load(&sophers->tte)  -atomic_load(&sophers->tts) + 1000;
 	return(ttt);
 }
 int	parse_and_store(t_philo *sophers, int argc, char **argv)

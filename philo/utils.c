@@ -50,12 +50,10 @@ size_t	get_time()
 int	my_usleep(t_id *cast_id, size_t ttw)
 {
 	size_t	time_rn;
-	atomic_size_t	i;
-	//atomic_size_t	time_s;
+	size_t	i;
 
 	i = 0;
 	time_rn = get_time();
-	//get_time_atomic(&time_s);
 	while(ttw > get_time() - time_rn)
 	{
 		if (i % 50 == 0)
@@ -67,8 +65,6 @@ int	my_usleep(t_id *cast_id, size_t ttw)
 				print_mutex(cast_id, NULL), 0);
 		}
 		usleep(50);
-		// printf("%i: %zu, %zu, %zu\n", cast_id->number, ttw, time_rn - time_s, atomic_load (cast_id->ttd));
-		// exit(1);
 		i++;
 	}
 	return (1);

@@ -47,6 +47,7 @@ void	*start_routine(void *ids)
 		routine_loop_odds(&stack_ids);
 	else
 		routine_loop_last(&stack_ids);
+	printf("hehe from %i\n", stack_ids.number);
 	return (NULL);
 }
 

@@ -41,6 +41,8 @@ int	pick_forks(t_id *cast_id, atomic_size_t *time)
 	(void) time;
 	select_fork(cast_id, &first, &second);
 	pthread_mutex_lock(first);
+	if(atomic_load(cast_id->death) > 0)
+		return(pthread_mutex_unlock(first), 0);
 	if (atomic_load(cast_id->ttd) <= get_time() 
 		- atomic_load(&cast_id->last_ate))
 		return (pthread_mutex_unlock(first), 0);

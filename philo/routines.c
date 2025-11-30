@@ -67,7 +67,6 @@ void	*think_routine(void *ids)
 	
 
 	cast_id = (t_id *) ids;
-	//get_time_atomic(&time);
 	if (atomic_load(cast_id->death) > 0)
 		return (NULL);
 	if (atomic_load(cast_id->ttd) <= get_time() - atomic_load(&cast_id->last_ate))
@@ -76,7 +75,6 @@ void	*think_routine(void *ids)
 	print_mutex(cast_id, "is thinking");
 	if (!my_usleep(cast_id, atomic_load(cast_id->ttt)))
 		return (NULL);
-	//get_time_atomic(&time);
 	if (atomic_load(cast_id->death) > 0)
 		return (NULL);
 	if (atomic_load(cast_id->ttd) <= get_time() 
@@ -93,11 +91,11 @@ void	*test_routine(void *ids)
 	cast_id = (t_id *) ids;
 	if (atomic_load(cast_id->eat_count) == NA)
 		while (atomic_load(cast_id->death) == 0)
-			usleep(1);
+			usleep(10);
 	else
 		while (atomic_load(cast_id->death) == 0
 			&& atomic_load(cast_id->end) == 0)
-			usleep(1);
+			usleep(10);
 	return (NULL);
 }
 
@@ -105,9 +103,7 @@ void	*sleep_routine(void *ids)
 {
 	t_id			*cast_id;
 	
-
 	cast_id = (t_id *) ids;
-	//get_time_atomic(&time);
 	if (atomic_load(cast_id->death) > 0)
 		return (NULL);
 	if (atomic_load(cast_id->ttd) <= get_time() - atomic_load(&cast_id->last_ate))
